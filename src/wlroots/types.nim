@@ -179,8 +179,6 @@ type WlrDataSource* = object
   compositor_action*: uint32
   events*: WlrDataSource_events
 
-type WlrDrag* = object
-
 type WlrDragIcon_events* = object
   map*: WlSignal
   unmap*: WlSignal
@@ -995,8 +993,6 @@ type WlrOutputEventBind* = object
   output*: ptr WlrOutput
   resource*: ptr WlResource
 
-type WlrSurface* = object
-
 ## wlr_output_power_management_v1
 
 # import wlr-output-power-management-unstable-v1-protocol
@@ -1028,8 +1024,6 @@ type WlrOutputPower_v1_set_mode_event* = object
 ## wlr_pointer_constraints_v1
 
 # import pointer-constraints-unstable-v1-protocol
-
-type WlrSeat* = object
 
 type WlrPointerConstraint_v1_type* = enum
   WLR_POINTER_CONSTRAINT_V1_LOCKED,
@@ -1184,10 +1178,6 @@ type WlrEventPointerPinchEnd* = object
 
 ## wlr_presentation_time
 
-type WlrOutput* = object
-
-type WlrOutputEventPresent* = object
-
 type WlrPresentation_events* = object
   destroy*: WlSignal
 
@@ -1226,8 +1216,6 @@ type WlrPresentation_event* = object
 type WlrBackend* = object
 
 ## wlr_primary_selection
-
-type WlrPrimarySelectionSource* = object
 
 type WlrPrimarySelectionSource_impl* = object
   send*: proc (source: ptr WlrPrimarySelectionSource; mime_type: cstring; fd: cint)
@@ -1376,8 +1364,6 @@ type WlrTouchPoint* = object
   events*: WlrTouchPoint_events
   link*: WlList
 
-type WlrSeatPointerGrab* = object
-
 type WlrPointerGrab_interface* = object
   enter*: proc (grab: ptr WlrSeatPointerGrab; surface: ptr WlrSurface; sx, sy: cdouble)
   clear_focus*: proc (grab: ptr WlrSeatPointerGrab)
@@ -1386,8 +1372,6 @@ type WlrPointerGrab_interface* = object
   axis*: proc (grab: ptr WlrSeatPointerGrab; time_msec: uint32; orientation: WlrAxisOrientation; value: cdouble; value_discrete: int32; source: WlrAxisSource)
   frame*: proc (grab: ptr WlrSeatPointerGrab)
   cancel*: proc (grab: ptr WlrSeatPointerGrab)
-
-type WlrSeatKeyboardGrab* = object
 
 type WlrKeyboardGrab_interface* = object
   enter*: proc (grab: ptr WlrSeatKeyboardGrab; surface: ptr WlrSurface; keycodes: ptr uint32; num_keycodes: csize_t; modifiers: ptr WlrKeyboardModifiers)
@@ -1413,7 +1397,7 @@ type WlrSeatKeyboardGrab* = object
   seat*: ptr WlrSeat
   data*: pointer
 
-type WlrSeatpointerGrab* = object
+type WlrSeatPointerGrab* = object
   `interface`*: ptr WlrPointerGrab_interface
   seat*: ptr WlrSeat
   data*: pointer
@@ -1461,8 +1445,6 @@ type WlrSeatTouchState* = object
   grab_id*: uint32
   grab*: ptr WlrSeatTouchGrab
   default_grab*: ptr WlrSeatTouchGrab
-
-type WlrPrimarySelectionSource* = object
 
 type WlrSeat_events* = object
   pointer_grab_begin*: WlSignal
