@@ -2,7 +2,7 @@
 
 import wayland, pixman
 
-type wlr_edges* = enum
+type WlrEdges* = enum
   WLR_EDGE_NONE = 0,
   WLR_EDGE_TOP = 1 shl 0,
   WLR_EDGE_BOTTOM = 1 shl 1,

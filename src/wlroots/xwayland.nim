@@ -7,7 +7,7 @@ type WlrXwm* = object
 
 type WlrXwaylandCursor* = object
 
-type WlrXwaylandServerEvents* = object
+type WlrXwaylandServer_events* = object
   ready*: WlSignal
   destroy*: WlSignal
 
@@ -24,7 +24,7 @@ type WlrXwaylandServer* = object
   lazy*: bool
   enable_wm*: bool
   wl_display*: ptr WlDisplay
-  events*: WlrXwaylandServerEvents
+  events*: WlrXwaylandServer_events
   client_destroy*: WlListener
   display_destroy*: WlListener
   data*: pointer
@@ -37,11 +37,11 @@ type WlrXwaylandServerReadyEvent* = object
   server*: ptr WlrXwaylandServer
   wm_fd*: cint
 
-type WlrXwaylandEvents* = object
+type WlrXwayland_events* = object
   ready*: WlSignal
   new_surface*: WlSignal
 
-type wlr_xwayland* = object
+type WlrXwayland* = object
   server*: ptr WlrXwaylandServer
   xwm*: ptr WlrXwm
   cursor*: ptr WlrXwaylandCursor
@@ -56,12 +56,12 @@ type wlr_xwayland* = object
   seat_destroy*: WlListener
   data*: pointer
 
-type wlr_xwayland_surface_decorations* = enum
+type WlrXwaylandSurfaceDecorations* = enum
   WLR_XWAYLAND_SURFACE_DECORATIONS_ALL = 0,
   WLR_XWAYLAND_SURFACE_DECORATIONS_NO_BORDER = 1,
   WLR_XWAYLAND_SURFACE_DECORATIONS_NO_TITLE = 2
 
-type wlr_xwayland_surface_hints* = object
+type WlrXwaylandSurfaceHints* = object
   flags*: uint32
   input*: uint32
   initial_state*: int32
@@ -71,7 +71,7 @@ type wlr_xwayland_surface_hints* = object
   icon_mask*: xcb_pixmap_t
   window_group*: xcb_window_t
 
-type wlr_xwayland_surface_size_hints* = object
+type WlrXwaylandSurfaceSizeHints* = object
   flags*: uint32
   x*, y*: int32
   width*, height*: int32
@@ -83,13 +83,13 @@ type wlr_xwayland_surface_size_hints* = object
   max_aspect_num*, max_aspect_den*: int32
   win_gravity*: uint32
 
-type wlr_xwayland_icccm_input_model* = enum
+type WlrXwaylandIcccmInputModel* = enum
   WLR_ICCCM_INPUT_MODEL_NONE = 0,
   WLR_ICCCM_INPUT_MODEL_PASSIVE = 1,
   WLR_ICCCM_INPUT_MODEL_LOCAL = 2,
   WLR_ICCCM_INPUT_MODEL_GLOBAL = 3
 
-type wlr_xwayland_surface_events* = object
+type WlrXwaylandSurface_events* = object
   destroy*: WlSignal
   request_configure*: WlSignal
   request_move*: WlSignal
@@ -112,7 +112,7 @@ type wlr_xwayland_surface_events* = object
   set_geometry*: WlSignal
   ping_timeout*: WlSignal
 
-type wlr_xwayland_surface* = object
+type WlrXwaylandSurface* = object
   window_id*: xcb_window_t
   xwm*: ptr WlrXwm
   surface_id*: uint32
@@ -131,9 +131,9 @@ type wlr_xwayland_surface* = object
   role*: cstring
   pid*: Pid
   has_utf8_title*: bool
-  children*: WlList         #  wlr_xwayland_surface::parent_link
+  children*: WlList
   parent*: ptr WlrXwaylandSurface
-  parent_link*: WlList      #  wlr_xwayland_surface::children
+  parent_link*: WlList
   window_type*: ptr xcb_atom_t
   window_type_len*: csize_t
   protocols*: ptr xcb_atom_t
@@ -150,7 +150,7 @@ type wlr_xwayland_surface* = object
   maximized_vert*, maximized_horz*: bool
   minimized*: bool
   has_alpha*: bool
-  events*: WlrXwaylandSurfaceEvents
+  events*: WlrXwaylandSurface_events
   surface_destroy*: WlListener
   data*: pointer
 

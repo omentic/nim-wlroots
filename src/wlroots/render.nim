@@ -6,15 +6,15 @@ import wayland, pixman
 
 const WLR_DMABUF_MAX_PLANES* = 4
 
-type wlr_dmabuf_attributes_flags* = enum
+type WlrDmabufAttributesFlags* = enum
   WLR_DMABUF_ATTRIBUTES_FLAGS_Y_INVERT = 1 shl 0,
   WLR_DMABUF_ATTRIBUTES_FLAGS_INTERLACED = 1 shl 1,
   WLR_DMABUF_ATTRIBUTES_FLAGS_BOTTOM_FIRST = 1 shl 2
 
-type wlr_dmabuf_attributes* = object
+type WlrDmabufAttributes* = object
   width*, height*: int32
   format*: uint32
-  flags*: uint32           #  enum wlr_dmabuf_attributes_flags
+  flags*: uint32
   modifier*: uint64
   n_planes*: cint
   offset*: array[WLR_DMABUF_MAX_PLANES, uint32]
@@ -101,16 +101,14 @@ proc dup_drm_fd*(egl: ptr WlrEgl): cint {.importc: "wlr_egl_dup_drm_fd".}
 
 ## gles2
 
-type wlr_egl* = object
-
 proc create_with_drm_fd_wlr_gles2_renderer*(drm_fd: cint): ptr WlrRenderer {.importc: "wlr_gles2_renderer_create_with_drm_fd".}
-proc create_wlr_gles2_renderer*(egl: ptr wlr_egl): ptr WlrRenderer {.importc: "wlr_gles2_renderer_create".}
+proc create_wlr_gles2_renderer*(egl: ptr WlrEgl): ptr WlrRenderer {.importc: "wlr_gles2_renderer_create".}
 
-proc get_egl*(renderer: ptr WlrRenderer): ptr wlr_egl {.importc: "wlr_gles2_renderer_get_egl".}
+proc get_egl*(renderer: ptr WlrRenderer): ptr WlrEgl {.importc: "wlr_gles2_renderer_get_egl".}
 proc check_ext*(renderer: ptr WlrRenderer; ext: cstring): bool {.importc: "wlr_gles2_renderer_check_ext".}
 
 proc get_current_fbo*(wlr_renderer: ptr WlrRenderer): GLuint {.importc: "wlr_gles2_renderer_get_current_fbo".}
-type wlr_gles2_texture_attribs* = object
+type WlrGles2Texture_attribs* = object
   target*: GLenum            #  either GL_TEXTURE_2D or GL_TEXTURE_EXTERNAL_OES
   tex*: GLuint
   inverted_y*: bool
@@ -118,11 +116,11 @@ type wlr_gles2_texture_attribs* = object
 
 proc is_gles2*(wlr_renderer: ptr WlrRenderer): bool {.importc: "wlr_renderer_is_gles2".}
 proc is_gles2*(texture: ptr WlrTexture): bool {.importc: "wlr_texture_is_gles2".}
-proc get_attribs*(texture: ptr WlrTexture; attribs: ptr wlr_gles2_texture_attribs) {.importc: "wlr_gles2_texture_get_attribs".}
+proc get_attribs*(texture: ptr WlrTexture; attribs: ptr WlrGles2Texture_attribs) {.importc: "wlr_gles2_texture_get_attribs".}
 
 ## interface
 
-type wlr_renderer_impl* = object
+type WlrRenderer_impl* = object
   bind_buffer*: proc (renderer: ptr WlrRenderer; buffer: ptr WlrBuffer): bool
 
   begin*: proc (renderer: ptr WlrRenderer; width, height: uint32)
@@ -144,7 +142,7 @@ type wlr_renderer_impl* = object
 
   texture_from_pixels*: proc (renderer: ptr WlrRenderer; fmt: uint32; stride, width, height: uint32; data: pointer): ptr WlrTexture
   texture_from_wl_drm*: proc (renderer: ptr WlrRenderer; data: ptr WlResource): ptr WlrTexture
-  texture_from_dmabuf*: proc (renderer: ptr WlrRenderer; attribs: ptr wlr_dmabuf_attributes): ptr WlrTexture
+  texture_from_dmabuf*: proc (renderer: ptr WlrRenderer; attribs: ptr WlrDmabufAttributes): ptr WlrTexture
 
   destroy*: proc (renderer: ptr WlrRenderer)
   init_wl_display*: proc (renderer: ptr WlrRenderer; WlDisplay: ptr WlDisplay): bool
@@ -152,11 +150,11 @@ type wlr_renderer_impl* = object
   get_drm_fd*: proc (renderer: ptr WlrRenderer): cint
   get_render_buffer_caps*: proc (renderer: ptr WlrRenderer): uint32
 
-  texture_from_buffer*: proc (renderer: ptr WlrRenderer; buffer: ptr wlr_buffer): ptr WlrTexture
+  texture_from_buffer*: proc (renderer: ptr WlrRenderer; buffer: ptr WlrBuffer): ptr WlrTexture
 
 proc init*(renderer: ptr WlrRenderer; impl: ptr WlrRenderer_impl) {.importc: "wlr_renderer_init".}
 
-type wlr_texture_impl* = object
+type WlrTexture_impl* = object
   is_opaque*: proc (texture: ptr WlrTexture): bool
   write_pixels*: proc (texture: ptr WlrTexture; stride, width, height: uint32; src_x, src_y: uint32; dst_x, dst_y: uint32; data: pointer): bool
   destroy*: proc (texture: ptr WlrTexture)
@@ -175,25 +173,24 @@ proc get_image*(wlr_texture: ptr WlrTexture): ptr PixmanImage {.importc: "wlr_pi
 
 ## wlr_renderer
 
-type wlr_renderer_read_pixels_flags = enum
+type wlrRendererReadPixelsFlags = enum
   WLR_RENDERER_READ_PIXELS_Y_INVERT = 1
 
-type wlr_renderer_impl* = object
-type wlr_drm_format_set* = object
+type WlrDrmFormatSet* = object
 type WlrBuffer* = object
 
-type wlr_renderer_events* = object
+type WlrRenderer_events* = object
   destroy*: WlSignal
 
-type wlr_renderer* = object
+type WlrRenderer* = object
   impl*: ptr WlrRenderer_impl
   rendering*: bool
   rendering_with_buffer*: bool
-  events*: wlr_renderer_events
+  events*: WlrRenderer_events
 
 proc autocreate_wlr_renderer*(backend: ptr WlrBackend): ptr WlrRenderer {.importc: "wlr_renderer_autocreate".}
 proc begin*(r: ptr WlrRenderer; width, height: uint32) {.importc: "wlr_renderer_begin".}
-proc begin_with_buffer*(r: ptr WlrRenderer; buffer: ptr wlr_buffer): bool {.importc: "wlr_renderer_begin_with_buffer".}
+proc begin_with_buffer*(r: ptr WlrRenderer; buffer: ptr WlrBuffer): bool {.importc: "wlr_renderer_begin_with_buffer".}
 proc endRenderer*(r: ptr WlrRenderer) {.importc: "wlr_renderer_end".}
 proc clear*(r: ptr WlrRenderer; color: array[4, cfloat]) {.importc: "wlr_renderer_clear".}
 
@@ -206,7 +203,7 @@ proc quad_with_matrix*(r: ptr WlrRenderer; color: array[4, cfloat]; matrix: arra
 proc get_shm_texture_formats*(r: ptr WlrRenderer; len: ptr csize_t): ptr uint32 {.importc: "wlr_renderer_get_shm_texture_formats".}
 proc resource_is_wl_drm_buffer*(renderer: ptr WlrRenderer; buffer: ptr WlResource): bool {.importc: "wlr_renderer_resource_is_wl_drm_buffer".}
 proc wl_drm_buffer_get_size*(renderer: ptr WlrRenderer; buffer: ptr WlResource; width, height: ptr cint) {.importc: "wlr_renderer_wl_drm_buffer_get_size".}
-proc get_dmabuf_texture_formats*(renderer: ptr WlrRenderer): ptr wlr_drm_format_set {.importc: "wlr_renderer_get_dmabuf_texture_formats".}
+proc get_dmabuf_texture_formats*(renderer: ptr WlrRenderer): ptr WlrDrmFormatSet {.importc: "wlr_renderer_get_dmabuf_texture_formats".}
 proc read_pixels*(r: ptr WlrRenderer; fmt: uint32; flags: ptr uint32; stride, width, height: uint32; src_x, src_y: uint32; dst_x, dst_y: uint32; data: pointer): bool {.importc: "wlr_renderer_read_pixels".}
 proc init_display*(r: ptr WlrRenderer; WlDisplay: ptr WlDisplay): bool {.importc: "wlr_renderer_init_wl_display".}
 proc get_drm_fd*(r: ptr WlrRenderer): cint {.importc: "wlr_renderer_get_drm_fd".}
@@ -214,8 +211,6 @@ proc destroy*(renderer: ptr WlrRenderer) {.importc: "wlr_renderer_destroy".}
 
 ## wlr_texture
 
-type WlrRenderer = object # NOTE: redefination of render/wlr_renderer
-type WlrTexture_impl* = object
 
 type WlrTexture* = object
   impl*: ptr WlrTexture_impl
@@ -223,7 +218,7 @@ type WlrTexture* = object
 
 proc wlr_texture_from_pixels*(renderer: ptr WlrRenderer; fmt: uint32; stride, width, height: uint32; data: pointer): ptr WlrTexture {.importc: "wlr_texture_from_pixels".}
 proc wlr_texture_from_wl_drm*(renderer: ptr WlrRenderer; data: ptr WlResource): ptr WlrTexture {.importc: "wlr_texture_from_wl_drm".}
-proc wlr_texture_from_dmabuf*(renderer: ptr WlrRenderer; attribs: ptr wlr_dmabuf_attributes): ptr WlrTexture {.importc: "wlr_texture_from_dmabuf".}
+proc wlr_texture_from_dmabuf*(renderer: ptr WlrRenderer; attribs: ptr WlrDmabufAttributes): ptr WlrTexture {.importc: "wlr_texture_from_dmabuf".}
 
 proc is_opaque*(texture: ptr WlrTexture): bool {.importc: "wlr_texture_is_opaque".}
 proc write_pixels*(texture: ptr WlrTexture; stride, width, height: uint32; src_x, src_y: uint32; dst_x, dst_y: uint32; data: pointer): bool {.importc: "wlr_texture_write_pixels".}

@@ -7,16 +7,16 @@ import wayland
 type WlrInputDeviceImpl* = object
   destroy*: proc (wlr_device: ptr WlrInputDevice)
 
-proc init*(wlr_device: ptr WlrInputDevice; `type`: wlr_input_device_type; impl: ptr WlrInputDeviceImpl; name: cstring; vendor: cint; product: cint) {.importc: "wlr_input_device_init".}
+proc init*(wlr_device: ptr WlrInputDevice; `type`: WlrInputDevice_type; impl: ptr WlrInputDevice_impl; name: cstring; vendor: cint; product: cint) {.importc: "wlr_input_device_init".}
 proc destroy*(dev: ptr WlrInputDevice) {.importc: "wlr_input_device_destroy".}
 
 ## wlr_keyboard
 
-type WlrKeyboardImpl* = object
+type WlrKeyboard_impl* = object
   destroy*: proc (keyboard: ptr WlrKeyboard)
   led_update*: proc (keyboard: ptr WlrKeyboard; leds: uint32)
 
-proc init*(keyboard: ptr WlrKeyboard; impl: ptr WlrKeyboardImpl) {.importc: "wlr_keyboard_init".}
+proc init*(keyboard: ptr WlrKeyboard; impl: ptr WlrKeyboard_impl) {.importc: "wlr_keyboard_init".}
 proc destroy*(keyboard: ptr WlrKeyboard) {.importc: "wlr_keyboard_destroy".}
 proc notify_key*(keyboard: ptr WlrKeyboard; event: ptr WlrEventKeyboardKey) {.importc: "wlr_keyboard_notify_key".}
 proc notify_modifiers*(keyboard: ptr WlrKeyboard; mods_depressed, mods_latched, mods_locked: uint32; group: uint32) {.importc: "wlr_keyboard_notify_modifiers".}
@@ -25,7 +25,7 @@ proc notify_modifiers*(keyboard: ptr WlrKeyboard; mods_depressed, mods_latched, 
 
 # const WLR_OUTPUT_STATE_BACKEND_OPTIONAL* = (WLR_OUTPUT_STATE_DAMAGE or WLR_OUTPUT_STATE_SCALE or WLR_OUTPUT_STATE_TRANSFORM or WLR_OUTPUT_STATE_ADAPTIVE_SYNC_ENABLED)
 
-type wlr_output_impl* = object
+type WlrOutputImpl* = object
   set_cursor*: proc (output: ptr WlrOutput; buffer: ptr WlrBuffer; hotspot_x, hotspot_y: cint): bool
   move_cursor*: proc (output: ptr WlrOutput; x, y: cint): bool
   destroy*: proc (output: ptr WlrOutput)
@@ -39,7 +39,7 @@ type wlr_output_impl* = object
   get_cursor_size*: proc (output: ptr WlrOutput; width, height: ptr cint)
   get_primary_formats*: proc (output: ptr WlrOutput; buffer_caps: uint32): ptr WlrDrmFormatSet
 
-proc init*(output: ptr WlrOutput; backend: ptr WlrBackend; impl: ptr wlr_output_impl; display: ptr WlDisplay) {.importc: "wlr_output_init".}
+proc init*(output: ptr WlrOutput; backend: ptr WlrBackend; impl: ptr WlrOutput_impl; display: ptr WlDisplay) {.importc: "wlr_output_init".}
 
 proc update_mode*(output: ptr WlrOutput; mode: ptr WlrOutputMode) {.importc: "wlr_output_update_mode".}
 proc update_custom_mode*(output: ptr WlrOutput; width, height: int32; refresh: int32) {.importc: "wlr_output_update_custom_mode".}
