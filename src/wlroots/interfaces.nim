@@ -1,93 +1,90 @@
-{.push dynlib: "libwlroots.so".}
+{.push dynlib: "libwlroots.so".} # 0.15.1
 
-import wayland
+
 
 ## wlr_input_device
 
-type WlrInputDeviceImpl* = object
-  destroy*: proc (wlr_device: ptr WlrInputDevice)
+type wlr_input_device_impl* {.bycopy.} = object
+  destroy*: proc (wlr_device: ptr wlr_input_device)
 
-proc init*(wlr_device: ptr WlrInputDevice; `type`: WlrInputDevice_type; impl: ptr WlrInputDevice_impl; name: cstring; vendor: cint; product: cint) {.importc: "wlr_input_device_init".}
-proc destroy*(dev: ptr WlrInputDevice) {.importc: "wlr_input_device_destroy".}
+proc wlr_input_device_init*(wlr_device: ptr wlr_input_device; `type`: wlr_input_device_type; impl: ptr wlr_input_device_impl; name: cstring; vendor: cint; product: cint) {.importc: "wlr_input_device_init".}
+proc wlr_input_device_destroy*(dev: ptr wlr_input_device) {.importc: "wlr_input_device_destroy".}
 
 ## wlr_keyboard
 
-type WlrKeyboard_impl* = object
-  destroy*: proc (keyboard: ptr WlrKeyboard)
-  led_update*: proc (keyboard: ptr WlrKeyboard; leds: uint32)
+type wlr_keyboard_impl* {.bycopy.} = object
+  destroy*: proc (keyboard: ptr wlr_keyboard)
+  led_update*: proc (keyboard: ptr wlr_keyboard; leds: uint32_t)
 
-proc init*(keyboard: ptr WlrKeyboard; impl: ptr WlrKeyboard_impl) {.importc: "wlr_keyboard_init".}
-proc destroy*(keyboard: ptr WlrKeyboard) {.importc: "wlr_keyboard_destroy".}
-proc notify_key*(keyboard: ptr WlrKeyboard; event: ptr WlrEventKeyboardKey) {.importc: "wlr_keyboard_notify_key".}
-proc notify_modifiers*(keyboard: ptr WlrKeyboard; mods_depressed, mods_latched, mods_locked: uint32; group: uint32) {.importc: "wlr_keyboard_notify_modifiers".}
+proc wlr_keyboard_init*(keyboard: ptr wlr_keyboard; impl: ptr wlr_keyboard_impl) {.importc: "wlr_keyboard_init".}
+proc wlr_keyboard_destroy*(keyboard: ptr wlr_keyboard) {.importc: "wlr_keyboard_destroy".}
+proc wlr_keyboard_notify_key*(keyboard: ptr wlr_keyboard; event: ptr wlr_event_keyboard_key) {.importc: "wlr_keyboard_notify_key".}
+proc wlr_keyboard_notify_modifiers*(keyboard: ptr wlr_keyboard; mods_depressed: uint32_t; mods_latched: uint32_t; mods_locked: uint32_t; group: uint32_t) {.importc: "wlr_keyboard_notify_modifiers".}
 
 ## wlr_output
 
-# const WLR_OUTPUT_STATE_BACKEND_OPTIONAL* = (WLR_OUTPUT_STATE_DAMAGE or WLR_OUTPUT_STATE_SCALE or WLR_OUTPUT_STATE_TRANSFORM or WLR_OUTPUT_STATE_ADAPTIVE_SYNC_ENABLED)
+const WLR_OUTPUT_STATE_BACKEND_OPTIONAL* = (WLR_OUTPUT_STATE_DAMAGE or
+    WLR_OUTPUT_STATE_SCALE or WLR_OUTPUT_STATE_TRANSFORM or
+    WLR_OUTPUT_STATE_RENDER_FORMAT or WLR_OUTPUT_STATE_ADAPTIVE_SYNC_ENABLED)
 
-type WlrOutputImpl* = object
-  set_cursor*: proc (output: ptr WlrOutput; buffer: ptr WlrBuffer; hotspot_x, hotspot_y: cint): bool
-  move_cursor*: proc (output: ptr WlrOutput; x, y: cint): bool
-  destroy*: proc (output: ptr WlrOutput)
-  attach_render*: proc (output: ptr WlrOutput; buffer_age: ptr cint): bool
-  rollback_render*: proc (output: ptr WlrOutput)
-  test*: proc (output: ptr WlrOutput): bool
-  commit*: proc (output: ptr WlrOutput): bool
-  get_gamma_size*: proc (output: ptr WlrOutput): csize_t
-  export_dmabuf*: proc (output: ptr WlrOutput; attribs: ptr WlrDmabufAttributes): bool
-  get_cursor_formats*: proc (output: ptr WlrOutput; buffer_caps: uint32): ptr WlrDrmFormatSet
-  get_cursor_size*: proc (output: ptr WlrOutput; width, height: ptr cint)
-  get_primary_formats*: proc (output: ptr WlrOutput; buffer_caps: uint32): ptr WlrDrmFormatSet
+type wlr_output_impl* {.bycopy.} = object
+  set_cursor*: proc (output: ptr wlr_output; buffer: ptr wlr_buffer; hotspot_x: cint; hotspot_y: cint): bool
+  move_cursor*: proc (output: ptr wlr_output; x: cint; y: cint): bool
+  destroy*: proc (output: ptr wlr_output)
+  test*: proc (output: ptr wlr_output): bool
+  commit*: proc (output: ptr wlr_output): bool
+  get_gamma_size*: proc (output: ptr wlr_output): csize_t
+  get_cursor_formats*: proc (output: ptr wlr_output; buffer_caps: uint32_t): ptr wlr_drm_format_set
+  get_cursor_size*: proc (output: ptr wlr_output; width: ptr cint; height: ptr cint)
+  get_primary_formats*: proc (output: ptr wlr_output; buffer_caps: uint32_t): ptr wlr_drm_format_set
 
-proc init*(output: ptr WlrOutput; backend: ptr WlrBackend; impl: ptr WlrOutput_impl; display: ptr WlDisplay) {.importc: "wlr_output_init".}
+proc wlr_output_init*(output: ptr wlr_output; backend: ptr wlr_backend; impl: ptr wlr_output_impl; display: ptr wl_display) {.importc: "wlr_output_init".}
+proc wlr_output_update_mode*(output: ptr wlr_output; mode: ptr wlr_output_mode) {.importc: "wlr_output_update_mode".}
+proc wlr_output_update_custom_mode*(output: ptr wlr_output; width: int32_t; height: int32_t; refresh: int32_t) {.importc: "wlr_output_update_custom_mode".}
+proc wlr_output_update_enabled*(output: ptr wlr_output; enabled: bool) {.importc: "wlr_output_update_enabled".}
+proc wlr_output_update_needs_frame*(output: ptr wlr_output) {.importc: "wlr_output_update_needs_frame".}
+proc wlr_output_damage_whole*(output: ptr wlr_output) {.importc: "wlr_output_damage_whole".}
+proc wlr_output_send_frame*(output: ptr wlr_output) {.importc: "wlr_output_send_frame".}
+proc wlr_output_send_present*(output: ptr wlr_output; event: ptr wlr_output_event_present) {.importc: "wlr_output_send_present".}
 
-proc update_mode*(output: ptr WlrOutput; mode: ptr WlrOutputMode) {.importc: "wlr_output_update_mode".}
-proc update_custom_mode*(output: ptr WlrOutput; width, height: int32; refresh: int32) {.importc: "wlr_output_update_custom_mode".}
-proc update_enabled*(output: ptr WlrOutput; enabled: bool) {.importc: "wlr_output_update_enabled".}
-proc update_needs_frame*(output: ptr WlrOutput) {.importc: "wlr_output_update_needs_frame".}
+## wlr_pointer
 
-proc damage_whole*(output: ptr WlrOutput) {.importc: "wlr_output_damage_whole".}
-proc send_frame*(output: ptr WlrOutput) {.importc: "wlr_output_send_frame".}
-proc send_present*(output: ptr WlrOutput; event: ptr WlrOutputEventPresent) {.importc: "wlr_output_send_present".}
+type wlr_pointer_impl* {.bycopy.} = object
+  destroy*: proc (pointer: ptr wlr_pointer)
 
-##  wlr_pointer
-
-type WlrPointerImpl* = object
-  destroy*: proc (pointer: ptr WlrPointer)
-
-proc init*(pointer: ptr WlrPointer; impl: ptr WlrPointerImpl) {.importc: "wlr_pointer_init".}
-proc destroy*(pointer: ptr WlrPointer) {.importc: "wlr_pointer_destroy".}
+proc wlr_pointer_init*(pointer: ptr wlr_pointer; impl: ptr wlr_pointer_impl) {.importc: "wlr_pointer_init".}
+proc wlr_pointer_destroy*(pointer: ptr wlr_pointer) {.importc: "wlr_pointer_destroy".}
 
 ## wlr_switch
 
-type WlrSwitchImpl* = object
-  destroy*: proc (switch_device: ptr WlrSwitch)
+type wlr_switch_impl* {.bycopy.} = object
+  destroy*: proc (switch_device: ptr wlr_switch)
 
-proc init*(switch_device: ptr WlrSwitch; impl: ptr WlrSwitchImpl) {.importc: "wlr_switch_init".}
-proc destroy*(switch_device: ptr WlrSwitch) {.importc: "wlr_switch_destroy".}
+proc wlr_switch_init*(switch_device: ptr wlr_switch; impl: ptr wlr_switch_impl) {.importc: "wlr_switch_init".}
+proc wlr_switch_destroy*(switch_device: ptr wlr_switch) {.importc: "wlr_switch_destroy".}
 
 ## wlr_tablet_pad
 
-type WlrTabletPadImpl* = object
-  destroy*: proc (pad: ptr WlrTabletPad)
+type wlr_tablet_pad_impl* {.bycopy.} = object
+  destroy*: proc (pad: ptr wlr_tablet_pad)
 
-proc init*(pad: ptr WlrTabletPad; impl: ptr WlrTabletPadImpl) {.importc: "wlr_tablet_pad_init".}
-proc destroy*(pad: ptr WlrTabletPad) {.importc: "wlr_tablet_pad_destroy".}
+proc wlr_tablet_pad_init*(pad: ptr wlr_tablet_pad; impl: ptr wlr_tablet_pad_impl) {.importc: "wlr_tablet_pad_init".}
+proc wlr_tablet_pad_destroy*(pad: ptr wlr_tablet_pad) {.importc: "wlr_tablet_pad_destroy".}
 
 ## wlr_tablet_tool
 
-type WlrTabletImpl* = object
-  destroy*: proc (tablet: ptr WlrTablet)
+type wlr_tablet_impl* {.bycopy.} = object
+  destroy*: proc (tablet: ptr wlr_tablet)
 
-proc init*(tablet: ptr WlrTablet; impl: ptr WlrTabletImpl) {.importc: "wlr_tablet_init".}
-proc destroy*(tablet: ptr WlrTablet) {.importc: "wlr_tablet_destroy".}
+proc wlr_tablet_init*(tablet: ptr wlr_tablet; impl: ptr wlr_tablet_impl) {.importc: "wlr_tablet_init".}
+proc wlr_tablet_destroy*(tablet: ptr wlr_tablet) {.importc: "wlr_tablet_destroy".}
 
 ## wlr_touch
 
-type WlrTouchImpl* = object
-  destroy*: proc (touch: ptr WlrTouch)
+type wlr_touch_impl* {.bycopy.} = object
+  destroy*: proc (touch: ptr wlr_touch)
 
-proc init*(touch: ptr WlrTouch; impl: ptr WlrTouchImpl) {.importc: "wlr_touch_init".}
-proc destroy*(touch: ptr WlrTouch) {.importc: "wlr_touch_destroy".}
+proc wlr_touch_init*(touch: ptr wlr_touch; impl: ptr wlr_touch_impl) {.importc: "wlr_touch_init".}
+proc wlr_touch_destroy*(touch: ptr wlr_touch) {.importc: "wlr_touch_destroy".}
 
 {.pop.}

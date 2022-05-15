@@ -1,152 +1,135 @@
 {.push dynlib: "libwlroots.so".}
 
-import posix
-import wayland
-
-type # FIXME: These are likely all wrong
-  udev = object
-  udev_monitor = object
-
 ## drm
 
-proc create_wlr_drm_backend*(display: ptr WlDisplay; session: ptr WlrSession; dev: ptr WlrDevice; parent: ptr WlrBackend): ptr WlrBackend {.importc: "wlr_drm_backend_create".}
+discard "forward decl of wlr_drm_backend"
+type INNER_C_STRUCT_drm_25* {.bycopy.} = object
+  destroy*: wl_signal
 
-proc isDRM*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_drm".}
-proc isDRM*(output: ptr WlrOutput): bool {.importc: "wlr_output_is_drm".}
+type wlr_drm_lease* {.bycopy.} = object
+  fd*: cint
+  lessee_id*: uint32_t
+  backend*: ptr wlr_drm_backend
+  events*: INNER_C_STRUCT_drm_25
+  data*: pointer
 
-proc getId*(output: ptr WlrOutput): uint32 {.importc: "wlr_drm_connector_get_id".}
+proc wlr_drm_backend_create*(display: ptr wl_display; session: ptr wlr_session; dev: ptr wlr_device; parent: ptr wlr_backend): ptr wlr_backend {.importc: "wlr_drm_backend_create".}
+proc wlr_backend_is_drm*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_drm".}
+proc wlr_output_is_drm*(output: ptr wlr_output): bool {.importc: "wlr_output_is_drm".}
+proc wlr_drm_connector_get_id*(output: ptr wlr_output): uint32_t {.importc: "wlr_drm_connector_get_id".}
+proc wlr_drm_backend_get_non_master_fd*(backend: ptr wlr_backend): cint {.importc: "wlr_drm_backend_get_non_master_fd".}
+proc wlr_drm_create_lease*(outputs: ptr ptr wlr_output; n_outputs: csize_t; lease_fd: ptr cint): ptr wlr_drm_lease {.importc: "wlr_drm_create_lease".}
+proc wlr_drm_lease_terminate*(lease: ptr wlr_drm_lease) {.importc: "wlr_drm_lease_terminate".}
 
-type drmModeModeInfo* = object # FIXME: Previously _drmModeModeInfo
+type drmModeModeInfo* = _drmModeModeInfo
 
-proc addMode*(output: ptr WlrOutput; mode: ptr drmModeModeInfo): ptr WlrOutputMode {.importc: "wlr_drm_connector_add_mode".}
+proc wlr_drm_connector_add_mode*(output: ptr wlr_output; mode: ptr drmModeModeInfo): ptr wlr_output_mode {.importc: "wlr_drm_connector_add_mode".}
+proc wlr_drm_connector_get_panel_orientation*(output: ptr wlr_output): wl_output_transform {.importc: "wlr_drm_connector_get_panel_orientation".}
 
 ## headless
 
-proc create_wlr_headless_backend*(display: ptr WlDisplay): ptr WlrBackend {.importc: "wlr_headless_backend_create".}
-proc create_with_renderer_wlr_headless_backend*(display: ptr WlDisplay; renderer: ptr WlrRenderer): ptr WlrBackend {.importc: "wlr_headless_backend_create_with_renderer".}
-proc add_output_wlr_headless*(backend: ptr WlrBackend; width, height: cuint): ptr WlrOutput {.importc: "wlr_headless_add_output".}
-
-proc add_input_device_wlr_headless*(backend: ptr WlrBackend; `type`: WlrInputDevice_type): ptr WlrInputDevice {.importc: "wlr_headless_add_input_device".}
-proc isHeadless*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_headless".}
-proc isHeadless*(device: ptr WlrInputDevice): bool {.importc: "wlr_input_device_is_headless".}
-proc isHeadless*(output: ptr WlrOutput): bool {.importc: "wlr_output_is_headless".}
+proc wlr_headless_backend_create*(display: ptr wl_display): ptr wlr_backend {.importc: "wlr_headless_backend_create".}
+proc wlr_headless_add_output*(backend: ptr wlr_backend; width: cuint; height: cuint): ptr wlr_output {.importc: "wlr_headless_add_output".}
+proc wlr_headless_add_input_device*(backend: ptr wlr_backend; `type`: wlr_input_device_type): ptr wlr_input_device {.importc: "wlr_headless_add_input_device".}
+proc wlr_backend_is_headless*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_headless".}
+proc wlr_input_device_is_headless*(device: ptr wlr_input_device): bool {.importc: "wlr_input_device_is_headless".}
+proc wlr_output_is_headless*(output: ptr wlr_output): bool {.importc: "wlr_output_is_headless".}
 
 ## interface
 
-type WlrBackend_impl* = object
-  start*: proc (backend: ptr WlrBackend): bool
-  destroy*: proc (backend: ptr WlrBackend)
-  get_renderer*: proc (backend: ptr WlrBackend): ptr WlrRenderer
-  get_session*: proc (backend: ptr WlrBackend): ptr WlrSession
-  get_presentation_clock*: proc (backend: ptr WlrBackend): ClockId
-  get_drm_fd*: proc (backend: ptr WlrBackend): cint
-  get_buffer_caps*: proc (backend: ptr WlrBackend): uint32
+type wlr_backend_impl* {.bycopy.} = object
+  start*: proc (backend: ptr wlr_backend): bool
+  destroy*: proc (backend: ptr wlr_backend)
+  get_session*: proc (backend: ptr wlr_backend): ptr wlr_session
+  get_presentation_clock*: proc (backend: ptr wlr_backend): clockid_t
+  get_drm_fd*: proc (backend: ptr wlr_backend): cint
+  get_buffer_caps*: proc (backend: ptr wlr_backend): uint32_t
 
-proc init*(backend: ptr WlrBackend; impl: ptr WlrBackend_impl) {.importc: "wlr_backend_init".}
-proc finish*(backend: ptr WlrBackend) {.importc: "wlr_backend_finish".}
+proc wlr_backend_init*(backend: ptr wlr_backend; impl: ptr wlr_backend_impl) {.importc: "wlr_backend_init".}
+proc wlr_backend_finish*(backend: ptr wlr_backend) {.importc: "wlr_backend_finish".}
 
 ## libinput
 
-type libinput_device = object
+proc wlr_libinput_backend_create*(display: ptr wl_display; session: ptr wlr_session): ptr wlr_backend {.importc: "wlr_libinput_backend_create".}
 
-proc create_libinput_backend*(display: ptr WlDisplay; session: ptr WlrSession): ptr WlrBackend {.importc: "wlr_libinput_backend_create".}
-proc get_libinput_device_handle*(dev: ptr WlrInputDevice): ptr libinput_device {.importc: "wlr_libinput_get_device_handle".}
-
-proc isLibinput*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_libinput".}
-proc isLibinput*(device: ptr WlrInputDevice): bool {.importc: "wlr_input_device_is_libinput".}
+proc wlr_libinput_get_device_handle*(dev: ptr wlr_input_device): ptr libinput_device {.importc: "wlr_libinput_get_device_handle".}
+proc wlr_backend_is_libinput*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_libinput".}
+proc wlr_input_device_is_libinput*(device: ptr wlr_input_device): bool {.importc: "wlr_input_device_is_libinput".}
 
 ## multi
 
-proc create_wlr_multi_backend*(display: ptr WlDisplay): ptr WlrBackend {.importc: "wlr_multi_backend_create".}
+proc wlr_multi_backend_create*(display: ptr wl_display): ptr wlr_backend {.importc: "wlr_multi_backend_create".}
+proc wlr_multi_backend_add*(multi: ptr wlr_backend; backend: ptr wlr_backend): bool {.importc: "wlr_multi_backend_add".}
+proc wlr_multi_backend_remove*(multi: ptr wlr_backend; backend: ptr wlr_backend) {.importc: "wlr_multi_backend_remove".}
+proc wlr_backend_is_multi*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_multi".}
+proc wlr_multi_is_empty*(backend: ptr wlr_backend): bool {.importc: "wlr_multi_is_empty".}
+proc wlr_multi_for_each_backend*(backend: ptr wlr_backend; callback: proc ( backend: ptr wlr_backend; data: pointer); data: pointer) {.importc: "wlr_multi_for_each_backend".}discard "forward decl of libseat"
 
-proc add*(multi: ptr WlrBackend; backend: ptr WlrBackend): bool {.importc: "wlr_multi_backend_add".}
-proc remove*(multi: ptr WlrBackend; backend: ptr WlrBackend) {.importc: "wlr_multi_backend_remove".}
+type INNER_C_STRUCT_session_18* {.bycopy.} = object
+  change*: wl_signal
+  remove*: wl_signal
 
-proc isMulti*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_multi".}
-proc isEmpty*(backend: ptr WlrBackend): bool {.importc: "wlr_multi_is_empty".}
-
-proc for_each_backend*(backend: ptr WlrBackend; callback: proc (backend: ptr WlrBackend; data: pointer); data: pointer) {.importc: "wlr_multi_for_each_backend".}
-
-## noop
-
-proc create_wlr_noop_backend*(display: ptr WlDisplay): ptr WlrBackend {.importc: "wlr_noop_backend_create".}
-proc addOutput*(backend: ptr WlrBackend): ptr WlrOutput {.importc: "wlr_noop_add_output".}
-proc isNoop*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_noop".}
-proc isNoop*(output: ptr WlrOutput): bool {.importc: "wlr_output_is_noop".}
-
-## session
-
-type libseat* = object
-
-type WlrDevice_events* = object
-  change*: WlSignal
-  remove*: WlSignal
-
-type WlrDevice* = object
+type wlr_device* {.bycopy.} = object
   fd*: cint
   device_id*: cint
-  dev*: Dev
-  link*: WlList
-  events*: WlrDevice_events
+  dev*: dev_t
+  link*: wl_list
+  events*: INNER_C_STRUCT_session_18
 
-type WlrSession_events* = object
-  active*: WlSignal
-  add_drm_card*: WlSignal   #  struct wlr_session_add_event
-  destroy*: WlSignal
+type INNER_C_STRUCT_session_50* {.bycopy.} = object
+  active*: wl_signal
+  add_drm_card*: wl_signal
+  destroy*: wl_signal
 
-type WlrSession* = object
+type wlr_session* {.bycopy.} = object
   active*: bool
   vtnr*: cuint
   seat*: array[256, char]
   udev*: ptr udev
   mon*: ptr udev_monitor
-  udev_event*: ptr WlEventSource
+  udev_event*: ptr wl_event_source
   seat_handle*: ptr libseat
-  libseat_event*: ptr WlEventSource
-  devices*: WlList
-  display*: ptr WlDisplay
-  display_destroy*: WlListener
-  events*: WlrSession_events
+  libseat_event*: ptr wl_event_source
+  devices*: wl_list
+  display*: ptr wl_display
+  display_destroy*: wl_listener
+  events*: INNER_C_STRUCT_session_50
 
-type WlrSessionAdd_event* = object
+type wlr_session_add_event* {.bycopy.} = object
   path*: cstring
 
-proc createWlrSession*(disp: ptr WlDisplay): ptr WlrSession {.importc: "wlr_session_create".}
-proc destroy*(session: ptr WlrSession) {.importc: "wlr_session_destroy".}
+type wlr_device_change_type* = enum
+  WLR_DEVICE_HOTPLUG = 1, WLR_DEVICE_LEASE
 
-proc openFile*(session: ptr WlrSession; path: cstring): ptr WlrDevice {.importc: "wlr_session_open_file".}
-proc closeFile*(session: ptr WlrSession; device: ptr WlrDevice) {.importc: "wlr_session_close_file".}
+type wlr_device_hotplug_event* {.bycopy.} = object
+  connector_id*: uint32_t
+  prop_id*: uint32_t
 
-proc changeVT*(session: ptr WlrSession; vt: cuint): bool {.importc: "wlr_session_change_vt".}
+type INNER_C_UNION_session_73* {.bycopy, union.} = object
+  hotplug*: wlr_device_hotplug_event
 
-type ssize_t = cint
+type wlr_device_change_event* {.bycopy.} = object
+  `type`*: wlr_device_change_type
+  ano_session_74*: INNER_C_UNION_session_73
 
-proc findGPUs*(session: ptr WlrSession; ret_len: csize_t; ret: ptr ptr WlrDevice): ssize_t {.importc: "wlr_session_find_gpus".}
-
-## wayland
-
-proc create_wlr_wl_backend*(display: ptr WlDisplay; remote: cstring): ptr WlrBackend {.importc: "wlr_wl_backend_create".}
-proc getRemoteDisplay*(backend: ptr WlrBackend): ptr WlDisplay {.importc: "wlr_wl_backend_get_remote_display".}
-proc create_wlr_wl_output*(backend: ptr WlrBackend): ptr WlrOutput {.importc: "wlr_wl_output_create".}
-
-proc isWayland*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_wl".}
-proc isWayland*(device: ptr WlrInputDevice): bool {.importc: "wlr_input_device_is_wl".}
-proc isWayland*(output: ptr WlrOutput): bool {.importc: "wlr_output_is_wl".}
-
-proc setTitleWayland*(output: ptr WlrOutput; title: cstring) {.importc: "wlr_wl_output_set_title".}
-
-proc getSurface*(output: ptr WlrOutput): ptr WlSurface {.importc: "wlr_wl_output_get_surface".}
-proc getSeat*(dev: ptr WlrInputDevice): ptr WlSeat {.importc: "wlr_wl_input_device_get_seat".}
-
-## x11
-
-proc createWlrX11_backend*(display: ptr WlDisplay; x11_display: cstring): ptr WlrBackend {.importc: "wlr_x11_backend_create".}
-proc createWlrX11_output*(backend: ptr WlrBackend): ptr WlrOutput {.importc: "wlr_x11_output_create".}
-
-proc isX11*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_is_x11".}
-proc isX11*(device: ptr WlrInputDevice): bool {.importc: "wlr_input_device_is_x11".}
-proc isX11*(output: ptr WlrOutput): bool {.importc: "wlr_output_is_x11".}
-
-proc setTitleX11*(output: ptr WlrOutput; title: cstring) {.importc: "wlr_x11_output_set_title".}
-
-{.pop.}
+proc wlr_session_create*(disp: ptr wl_display): ptr wlr_session {.importc: "wlr_session_create".}
+proc wlr_session_destroy*(session: ptr wlr_session) {.importc: "wlr_session_destroy".}
+proc wlr_session_open_file*(session: ptr wlr_session; path: cstring): ptr wlr_device {.importc: "wlr_session_open_file".}
+proc wlr_session_close_file*(session: ptr wlr_session; device: ptr wlr_device) {.importc: "wlr_session_close_file".}
+proc wlr_session_change_vt*(session: ptr wlr_session; vt: cuint): bool {.importc: "wlr_session_change_vt".}
+proc wlr_session_find_gpus*(session: ptr wlr_session; ret_len: csize_t; ret: ptr ptr wlr_device): ssize_t {.importc: "wlr_session_find_gpus".}
+proc wlr_wl_backend_create*(display: ptr wl_display; remote: cstring): ptr wlr_backend {.importc: "wlr_wl_backend_create".}
+proc wlr_wl_backend_get_remote_display*(backend: ptr wlr_backend): ptr wl_display {.importc: "wlr_wl_backend_get_remote_display".}
+proc wlr_wl_output_create*(backend: ptr wlr_backend): ptr wlr_output {.importc: "wlr_wl_output_create".}
+proc wlr_backend_is_wl*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_wl".}
+proc wlr_input_device_is_wl*(device: ptr wlr_input_device): bool {.importc: "wlr_input_device_is_wl".}
+proc wlr_output_is_wl*(output: ptr wlr_output): bool {.importc: "wlr_output_is_wl".}
+proc wlr_wl_output_set_title*(output: ptr wlr_output; title: cstring) {.importc: "wlr_wl_output_set_title".}
+proc wlr_wl_output_get_surface*(output: ptr wlr_output): ptr wl_surface {.importc: "wlr_wl_output_get_surface".}
+proc wlr_wl_input_device_get_seat*(dev: ptr wlr_input_device): ptr wl_seat {.importc: "wlr_wl_input_device_get_seat".}
+proc wlr_x11_backend_create*(display: ptr wl_display; x11_display: cstring): ptr wlr_backend {.importc: "wlr_x11_backend_create".}
+proc wlr_x11_output_create*(backend: ptr wlr_backend): ptr wlr_output {.importc: "wlr_x11_output_create".}
+proc wlr_backend_is_x11*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_is_x11".}
+proc wlr_input_device_is_x11*(device: ptr wlr_input_device): bool {.importc: "wlr_input_device_is_x11".}
+proc wlr_output_is_x11*(output: ptr wlr_output): bool {.importc: "wlr_output_is_x11".}
+proc wlr_x11_output_set_title*(output: ptr wlr_output; title: cstring) {.importc: "wlr_x11_output_set_title".}
