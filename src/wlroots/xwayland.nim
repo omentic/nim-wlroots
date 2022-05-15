@@ -6,19 +6,19 @@ import wayland, xcb, wlroots/types
 ## shim TODO
 type
   csize_t = object
-  WlrXwm = object
-  WlrXwaylandCursor = object
+  Xwm = object
+  XwaylandCursor = object
 
-type WlrXwaylandServer_options* {.bycopy.} = object
+type XwaylandServer_options* {.bycopy.} = object
   lazy*: bool
   enable_wm*: bool
   no_touch_pointer_emulation*: bool
 
-type WlrXwaylandServer_events* {.bycopy.} = object
+type XwaylandServer_events* {.bycopy.} = object
   ready*: WlSignal
   destroy*: WlSignal
 
-type WlrXwaylandServer* {.bycopy.} = object
+type XwaylandServer* {.bycopy.} = object
   pid*: Pid
   client*: ptr WlClient
   pipe_source*: ptr WlEventSource
@@ -29,43 +29,43 @@ type WlrXwaylandServer* {.bycopy.} = object
   display_name*: array[16, char]
   x_fd*: array[2, cint]
   x_fd_read_event*: array[2, ptr WlEventSource]
-  options*: WlrXwaylandServer_options
+  options*: XwaylandServer_options
   wl_display*: ptr WlDisplay
-  events*: WlrXwaylandServer_events
+  events*: XwaylandServer_events
   client_destroy*: WlListener
   display_destroy*: WlListener
   data*: pointer
 
-type WlrXwaylandServerReadyEvent* {.bycopy.} = object
-  server*: ptr WlrXwaylandServer
+type XwaylandServerReadyEvent* {.bycopy.} = object
+  server*: ptr XwaylandServer
   wm_fd*: cint
 
-type WlrXwayland_events* {.bycopy.} = object
+type Xwayland_events* {.bycopy.} = object
   ready*: WlSignal
   new_surface*: WlSignal
   remove_startup_info*: WlSignal
 
-type WlrXwayland* {.bycopy.} = object
-  server*: ptr WlrXwaylandServer
-  xwm*: ptr WlrXwm
-  cursor*: ptr WlrXwaylandCursor
+type Xwayland* {.bycopy.} = object
+  server*: ptr XwaylandServer
+  xwm*: ptr Xwm
+  cursor*: ptr XwaylandCursor
   display_name*: cstring
   wl_display*: ptr WlDisplay
-  compositor*: ptr WlrCompositor
-  seat*: ptr WlrSeat
-  events*: WlrXwayland_events
-  user_event_handler*: proc (xwm: ptr WlrXwm; event: ptr XcbGenericEvent): cint
+  compositor*: ptr Compositor
+  seat*: ptr Seat
+  events*: Xwayland_events
+  user_event_handler*: proc (xwm: ptr Xwm; event: ptr XcbGenericEvent): cint
   server_ready*: WlListener
   server_destroy*: WlListener
   seat_destroy*: WlListener
   data*: pointer
 
-type WlrXwaylandSurfaceDecorations* = enum
+type XwaylandSurfaceDecorations* = enum
   WLR_XWAYLAND_SURFACE_DECORATIONS_ALL = 0,
   WLR_XWAYLAND_SURFACE_DECORATIONS_NO_BORDER = 1,
   WLR_XWAYLAND_SURFACE_DECORATIONS_NO_TITLE = 2
 
-type WlrXwaylandSurfaceHints* {.bycopy.} = object
+type XwaylandSurfaceHints* {.bycopy.} = object
   flags*: uint32
   input*: uint32
   initial_state*: int32
@@ -76,7 +76,7 @@ type WlrXwaylandSurfaceHints* {.bycopy.} = object
   icon_mask*: XcbPixmap
   window_group*: XcbWindow
 
-type WlrXwaylandSurfaceSizeHints* {.bycopy.} = object
+type XwaylandSurfaceSizeHints* {.bycopy.} = object
   flags*: uint32
   x*, y*: int32
   width*,  height*: int32
@@ -88,13 +88,13 @@ type WlrXwaylandSurfaceSizeHints* {.bycopy.} = object
   max_aspect_num*, max_aspect_den*: int32
   win_gravity*: uint32
 
-type WlrXwaylandIcccmInputModel* = enum
+type XwaylandIcccmInputModel* = enum
   WLR_ICCCM_INPUT_MODEL_NONE = 0,
   WLR_ICCCM_INPUT_MODEL_PASSIVE = 1,
   WLR_ICCCM_INPUT_MODEL_LOCAL = 2,
   WLR_ICCCM_INPUT_MODEL_GLOBAL = 3
 
-type WlrXwaylandSurface_events* {.bycopy.} = object
+type XwaylandSurface_events* {.bycopy.} = object
   destroy*: WlSignal
   request_configure*: WlSignal
   request_move*: WlSignal
@@ -118,14 +118,14 @@ type WlrXwaylandSurface_events* {.bycopy.} = object
   set_geometry*: WlSignal
   ping_timeout*: WlSignal
 
-type WlrXwaylandSurface* {.bycopy.} = object
+type XwaylandSurface* {.bycopy.} = object
   window_id*: XcbWindow
-  xwm*: ptr WlrXwm
+  xwm*: ptr Xwm
   surface_id*: uint32
   link*: WlList
   stack_link*: WlList
   unpaired_link*: WlList
-  surface*: ptr WlrSurface
+  surface*: ptr Surface
   x*, y*: int16
   width*, height*: uint16
   saved_width*, saved_height*: uint16
@@ -139,16 +139,16 @@ type WlrXwaylandSurface* {.bycopy.} = object
   pid*: Pid
   has_utf8_title*: bool
   children*: WlList
-  parent*: ptr WlrXwaylandSurface
+  parent*: ptr XwaylandSurface
   parent_link*: WlList
   window_type*: ptr XcbAtom
   window_type_len*: csize_t
   protocols*: ptr XcbAtom
   protocols_len*: csize_t
   decorations*: uint32
-  hints*: ptr WlrXwaylandSurfaceHints
+  hints*: ptr XwaylandSurfaceHints
   hints_urgency*: uint32
-  size_hints*: ptr WlrXwaylandSurfaceSizeHints
+  size_hints*: ptr XwaylandSurfaceSizeHints
   pinging*: bool
   ping_timer*: ptr WlEventSource
   modal*: bool
@@ -157,52 +157,52 @@ type WlrXwaylandSurface* {.bycopy.} = object
   maximized_horz*: bool
   minimized*: bool
   has_alpha*: bool
-  events*: WlrXwaylandSurface_events
+  events*: XwaylandSurface_events
   surface_destroy*: WlListener
   data*: pointer
 
-type WlrXwaylandSurfaceConfigureEvent* {.bycopy.} = object
-  surface*: ptr WlrXwaylandSurface
+type XwaylandSurfaceConfigureEvent* {.bycopy.} = object
+  surface*: ptr XwaylandSurface
   x*, y*: int16
   width*, height*: uint16
   mask*: uint16
 
-type WlrXwaylandMoveEvent* {.bycopy.} = object
-  surface*: ptr WlrXwaylandSurface
+type XwaylandMoveEvent* {.bycopy.} = object
+  surface*: ptr XwaylandSurface
 
-type WlrXwaylandRemoveStartupInfoEvent* {.bycopy.} = object
+type XwaylandRemoveStartupInfoEvent* {.bycopy.} = object
   id*: cstring
   window*: XcbWindow
 
-type WlrXwaylandResizeEvent* {.bycopy.} = object
-  surface*: ptr WlrXwaylandSurface
+type XwaylandResizeEvent* {.bycopy.} = object
+  surface*: ptr XwaylandSurface
   edges*: uint32
 
-type WlrXwaylandMinimizeEvent* {.bycopy.} = object
-  surface*: ptr WlrXwaylandSurface
+type XwaylandMinimizeEvent* {.bycopy.} = object
+  surface*: ptr XwaylandSurface
   minimize*: bool
 
-proc createWlrXwaylandServer*(display: ptr WlDisplay; options: ptr WlrXwaylandServer_options): ptr WlrXwaylandServer {.importc: "wlr_xwayland_server_create".}
-proc destroy*(server: ptr WlrXwaylandServer) {.importc: "wlr_xwayland_server_destroy".}
+proc createXwaylandServer*(display: ptr WlDisplay; options: ptr XwaylandServer_options): ptr XwaylandServer {.importc: "wlr_xwayland_server_create".}
+proc destroy*(server: ptr XwaylandServer) {.importc: "wlr_xwayland_server_destroy".}
 
-proc createWlrXwayland*(wl_display: ptr WlDisplay; compositor: ptr WlrCompositor; lazy: bool): ptr WlrXwayland {.importc: "wlr_xwayland_create".}
-proc destroy*(wlr_xwayland: ptr WlrXwayland) {.importc: "wlr_xwayland_destroy".}
+proc createXwayland*(wl_display: ptr WlDisplay; compositor: ptr Compositor; lazy: bool): ptr Xwayland {.importc: "wlr_xwayland_create".}
+proc destroy*(wlr_xwayland: ptr Xwayland) {.importc: "wlr_xwayland_destroy".}
 
-proc setCursor*(wlr_xwayland: ptr WlrXwayland; pixels: ptr uint8; stride: uint32; width: uint32; height: uint32; hotspot_x: int32; hotspot_y: int32) {.importc: "wlr_xwayland_set_cursor".}
-proc activate*(surface: ptr WlrXwaylandSurface; activated: bool) {.importc: "wlr_xwayland_surface_activate".}
-proc restack*(surface: ptr WlrXwaylandSurface; sibling: ptr WlrXwaylandSurface; mode: XcbStackMode) {.importc: "wlr_xwayland_surface_restack".}
-proc configure*(surface: ptr WlrXwaylandSurface; x: int16; y: int16; width: uint16; height: uint16) {.importc: "wlr_xwayland_surface_configure".}
-proc close*(surface: ptr WlrXwaylandSurface) {.importc: "wlr_xwayland_surface_close".}
+proc setCursor*(wlr_xwayland: ptr Xwayland; pixels: ptr uint8; stride: uint32; width: uint32; height: uint32; hotspot_x: int32; hotspot_y: int32) {.importc: "wlr_xwayland_set_cursor".}
+proc activate*(surface: ptr XwaylandSurface; activated: bool) {.importc: "wlr_xwayland_surface_activate".}
+proc restack*(surface: ptr XwaylandSurface; sibling: ptr XwaylandSurface; mode: XcbStackMode) {.importc: "wlr_xwayland_surface_restack".}
+proc configure*(surface: ptr XwaylandSurface; x: int16; y: int16; width: uint16; height: uint16) {.importc: "wlr_xwayland_surface_configure".}
+proc close*(surface: ptr XwaylandSurface) {.importc: "wlr_xwayland_surface_close".}
 
-proc setMinimized*(surface: ptr WlrXwaylandSurface; minimized: bool) {.importc: "wlr_xwayland_surface_set_minimized".}
-proc setMaximized*(surface: ptr WlrXwaylandSurface; maximized: bool) {.importc: "wlr_xwayland_surface_set_maximized".}
-proc setFullscreen*(surface: ptr WlrXwaylandSurface; fullscreen: bool) {.importc: "wlr_xwayland_surface_set_fullscreen".}
-proc setSeat*(xwayland: ptr WlrXwayland; seat: ptr WlrSeat) {.importc: "wlr_xwayland_set_seat".}
+proc setMinimized*(surface: ptr XwaylandSurface; minimized: bool) {.importc: "wlr_xwayland_surface_set_minimized".}
+proc setMaximized*(surface: ptr XwaylandSurface; maximized: bool) {.importc: "wlr_xwayland_surface_set_maximized".}
+proc setFullscreen*(surface: ptr XwaylandSurface; fullscreen: bool) {.importc: "wlr_xwayland_surface_set_fullscreen".}
+proc setSeat*(xwayland: ptr Xwayland; seat: ptr Seat) {.importc: "wlr_xwayland_set_seat".}
 
-proc isXwaylandSurface*(surface: ptr WlrSurface): bool {.importc: "wlr_surface_is_xwayland_surface".}
-proc wlrXwaylandSurfaceFromWlrSurface*(surface: ptr WlrSurface): ptr WlrXwaylandSurface {.importc: "wlr_xwayland_surface_from_wlr_surface".} # XXX: bad name lol
-proc ping*(surface: ptr WlrXwaylandSurface) {.importc: "wlr_xwayland_surface_ping".}
-proc wantsFocus*(xsurface: ptr WlrXwaylandSurface): bool {.importc: "wlr_xwayland_or_surface_wants_focus".}
-proc wlrXwaylandIcccmInputModel*(xsurface: ptr WlrXwaylandSurface): WlrXwaylandIcccmInputModel {.importc: "wlr_xwayland_icccm_input_model".}
+proc isXwaylandSurface*(surface: ptr Surface): bool {.importc: "wlr_surface_is_xwayland_surface".}
+proc xwaylandSurfaceFromSurface*(surface: ptr Surface): ptr XwaylandSurface {.importc: "wlr_xwayland_surface_from_wlr_surface".} # XXX: bad name lol
+proc ping*(surface: ptr XwaylandSurface) {.importc: "wlr_xwayland_surface_ping".}
+proc wantsFocus*(xsurface: ptr XwaylandSurface): bool {.importc: "wlr_xwayland_or_surface_wants_focus".}
+proc xwaylandIcccmInputModel*(xsurface: ptr XwaylandSurface): XwaylandIcccmInputModel {.importc: "wlr_xwayland_icccm_input_model".}
 
 {.pop.}

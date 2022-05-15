@@ -4,7 +4,7 @@ import wayland
 
 ## edges
 
-type WlrEdges* = enum
+type Edges* = enum
   WLR_EDGE_NONE = 0,
   WLR_EDGE_TOP = 1 shl 0,
   WLR_EDGE_BOTTOM = 1 shl 1,
@@ -14,43 +14,43 @@ type WlrEdges* = enum
 ## addon
 
 type
-  WlrAddon* {.bycopy.} = object
-    impl*: ptr WlrAddonInterface
+  Addon* {.bycopy.} = object
+    impl*: ptr AddonInterface
     owner*: pointer
     link*: WlList
 
-  WlrAddonInterface* {.bycopy.} = object
+  AddonInterface* {.bycopy.} = object
     name*: cstring
-    destroy*: proc (addon: ptr WlrAddon)
+    destroy*: proc (addon: ptr Addon)
 
-type WlrAddonSet* {.bycopy.} = object
+type AddonSet* {.bycopy.} = object
   addons*: WlList
 
-proc init*(set: ptr WlrAddonSet) {.importc: "wlr_addon_set_init".}
-proc finish*(set: ptr WlrAddonSet) {.importc: "wlr_addon_set_finish".}
-proc init*(addon: ptr WlrAddon; set: ptr WlrAddonSet; owner: pointer; impl: ptr WlrAddonInterface) {.importc: "wlr_addon_init".}
-proc finish*(addon: ptr WlrAddon) {.importc: "wlr_addon_finish".}
-proc findWlrAddon*(set: ptr WlrAddonSet; owner: pointer; impl: ptr WlrAddonInterface): ptr WlrAddon {.importc: "wlr_addon_find".}
+proc init*(set: ptr AddonSet) {.importc: "wlr_addon_set_init".}
+proc finish*(set: ptr AddonSet) {.importc: "wlr_addon_set_finish".}
+proc init*(addon: ptr Addon; set: ptr AddonSet; owner: pointer; impl: ptr AddonInterface) {.importc: "wlr_addon_init".}
+proc finish*(addon: ptr Addon) {.importc: "wlr_addon_finish".}
+proc findAddon*(set: ptr AddonSet; owner: pointer; impl: ptr AddonInterface): ptr Addon {.importc: "wlr_addon_find".}
 
 ## box
 
-type WlrBox* {.bycopy.} = object
+type Box* {.bycopy.} = object
   x*, y*: cint
   width*, height*: cint
 
-type WlrFbox* {.bycopy.} = object
+type Fbox* {.bycopy.} = object
   x*, y*: cdouble
   width*, height*: cdouble
 
-proc closestPoint*(box: ptr WlrBox; x: cdouble; y: cdouble; dest_x: ptr cdouble; dest_y: ptr cdouble) {.importc: "wlr_box_closest_point".}
-proc intersection*(dest: ptr WlrBox; box_a: ptr WlrBox; box_b: ptr WlrBox): bool {.importc: "wlr_box_intersection".}
-proc containsPoint*(box: ptr WlrBox; x: cdouble; y: cdouble): bool {.importc: "wlr_box_contains_point".}
+proc closestPoint*(box: ptr Box; x: cdouble; y: cdouble; dest_x: ptr cdouble; dest_y: ptr cdouble) {.importc: "wlr_box_closest_point".}
+proc intersection*(dest: ptr Box; box_a: ptr Box; box_b: ptr Box): bool {.importc: "wlr_box_intersection".}
+proc containsPoint*(box: ptr Box; x: cdouble; y: cdouble): bool {.importc: "wlr_box_contains_point".}
 
-proc empty*(box: ptr WlrBox): bool {.importc: "wlr_box_empty".}
-proc transform*(dest: ptr WlrBox; box: ptr WlrBox; transform: WlOutputTransform; width: cint; height: cint) {.importc: "wlr_box_transform".}
+proc empty*(box: ptr Box): bool {.importc: "wlr_box_empty".}
+proc transform*(dest: ptr Box; box: ptr Box; transform: WlOutputTransform; width: cint; height: cint) {.importc: "wlr_box_transform".}
 
-proc empty*(box: ptr WlrFbox): bool {.importc: "wlr_fbox_empty".}
-proc transform*(dest: ptr WlrFbox; box: ptr WlrFbox; transform: WlOutputTransform; width: cdouble; height: cdouble) {.importc: "wlr_fbox_transform".}
+proc empty*(box: ptr Fbox): bool {.importc: "wlr_fbox_empty".}
+proc transform*(dest: ptr Fbox; box: ptr Fbox; transform: WlOutputTransform; width: cdouble; height: cdouble) {.importc: "wlr_fbox_transform".}
 
 # XXX: where'd region go?
 
@@ -66,18 +66,18 @@ proc transform*(dest: ptr WlrFbox; box: ptr WlrFbox; transform: WlOutputTransfor
 #include <string.h>
 #include <errno.h>
 
-type WlrLogImportance* = enum
+type LogImportance* = enum
   WLR_SILENT = 0,
   WLR_ERROR = 1,
   WLR_INFO = 2,
   WLR_DEBUG = 3,
   WLR_LOG_IMPORTANCE_LAST
 
-type WlrLogFunc* =
-  proc (importance: WlrLogImportance; fmt: cstring; args: varargs[string])
+type LogFunc* =
+  proc (importance: LogImportance; fmt: cstring; args: varargs[string])
 
-proc WlrLogInit*(verbosity: WlrLogImportance; callback: WlrLogFunc) {.importc: "wlr_log_init".}
-proc WlrLogGetVerbosity*(): WlrLogImportance {.importc: "wlr_log_get_verbosity".}
+proc LogInit*(verbosity: LogImportance; callback: LogFunc) {.importc: "wlr_log_init".}
+proc LogGetVerbosity*(): LogImportance {.importc: "wlr_log_get_verbosity".}
 
 when defined(__GNUC__):
   const _WLR_ATTRIB_PRINTF(start, end) = __attribute__((format(printf, start, end)))
