@@ -1,5 +1,7 @@
 {.push dynlib: "libwlroots.so".}
 
+import wlroots/util
+
 type WlrXcursorImage* {.bycopy.} = object
   width*, height*: uint32
   hotspot_x*, hotspot_y*: uint32

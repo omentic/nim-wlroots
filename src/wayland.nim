@@ -9,8 +9,8 @@ type
   WlEventSource* = object
   WlSurface* = object
   WlSeat* = object
-  WlOutputTransform* = object
   WlOutputSubpixel* = object
+  WlOutputTransform* = object
   WlResource* = object
   WlGlobal* = object
   WlDataDeviceManagerDndAction* = object

@@ -1,7 +1,13 @@
 {.push dynlib: "libwlroots.so".}
 
 import std/posix
-import wayland
+import wayland, xcb, wlroots/types
+
+## shim TODO
+type
+  csize_t = object
+  WlrXwm = object
+  WlrXwaylandCursor = object
 
 type WlrXwaylandServer_options* {.bycopy.} = object
   lazy*: bool
@@ -48,7 +54,7 @@ type WlrXwayland* {.bycopy.} = object
   compositor*: ptr WlrCompositor
   seat*: ptr WlrSeat
   events*: WlrXwayland_events
-  user_event_handler*: proc (xwm: ptr WlrXwm; event: ptr xcb_generic_event_t): cint
+  user_event_handler*: proc (xwm: ptr WlrXwm; event: ptr XcbGenericEvent): cint
   server_ready*: WlListener
   server_destroy*: WlListener
   seat_destroy*: WlListener
@@ -63,12 +69,12 @@ type WlrXwaylandSurfaceHints* {.bycopy.} = object
   flags*: uint32
   input*: uint32
   initial_state*: int32
-  icon_pixmap*: xcb_pixmap_t
-  icon_window*: xcb_window_t
+  icon_pixmap*: XcbPixmap
+  icon_window*: XcbWindow
   icon_x*: int32
   icon_y*: int32
-  icon_mask*: xcb_pixmap_t
-  window_group*: xcb_window_t
+  icon_mask*: XcbPixmap
+  window_group*: XcbWindow
 
 type WlrXwaylandSurfaceSizeHints* {.bycopy.} = object
   flags*: uint32
@@ -113,7 +119,7 @@ type WlrXwaylandSurface_events* {.bycopy.} = object
   ping_timeout*: WlSignal
 
 type WlrXwaylandSurface* {.bycopy.} = object
-  window_id*: xcb_window_t
+  window_id*: XcbWindow
   xwm*: ptr WlrXwm
   surface_id*: uint32
   link*: WlList
@@ -135,9 +141,9 @@ type WlrXwaylandSurface* {.bycopy.} = object
   children*: WlList
   parent*: ptr WlrXwaylandSurface
   parent_link*: WlList
-  window_type*: ptr xcb_atom_t
+  window_type*: ptr XcbAtom
   window_type_len*: csize_t
-  protocols*: ptr xcb_atom_t
+  protocols*: ptr XcbAtom
   protocols_len*: csize_t
   decorations*: uint32
   hints*: ptr WlrXwaylandSurfaceHints
@@ -166,7 +172,7 @@ type WlrXwaylandMoveEvent* {.bycopy.} = object
 
 type WlrXwaylandRemoveStartupInfoEvent* {.bycopy.} = object
   id*: cstring
-  window*: xcb_window_t
+  window*: XcbWindow
 
 type WlrXwaylandResizeEvent* {.bycopy.} = object
   surface*: ptr WlrXwaylandSurface
@@ -184,7 +190,7 @@ proc destroy*(wlr_xwayland: ptr WlrXwayland) {.importc: "wlr_xwayland_destroy".}
 
 proc setCursor*(wlr_xwayland: ptr WlrXwayland; pixels: ptr uint8; stride: uint32; width: uint32; height: uint32; hotspot_x: int32; hotspot_y: int32) {.importc: "wlr_xwayland_set_cursor".}
 proc activate*(surface: ptr WlrXwaylandSurface; activated: bool) {.importc: "wlr_xwayland_surface_activate".}
-proc restack*(surface: ptr WlrXwaylandSurface; sibling: ptr WlrXwaylandSurface; mode: xcb_stack_mode_t) {.importc: "wlr_xwayland_surface_restack".}
+proc restack*(surface: ptr WlrXwaylandSurface; sibling: ptr WlrXwaylandSurface; mode: XcbStackMode) {.importc: "wlr_xwayland_surface_restack".}
 proc configure*(surface: ptr WlrXwaylandSurface; x: int16; y: int16; width: uint16; height: uint16) {.importc: "wlr_xwayland_surface_configure".}
 proc close*(surface: ptr WlrXwaylandSurface) {.importc: "wlr_xwayland_surface_close".}
 

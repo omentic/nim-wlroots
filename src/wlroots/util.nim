@@ -2,6 +2,15 @@
 
 import wayland
 
+## edges
+
+type WlrEdges* = enum
+  WLR_EDGE_NONE = 0,
+  WLR_EDGE_TOP = 1 shl 0,
+  WLR_EDGE_BOTTOM = 1 shl 1,
+  WLR_EDGE_LEFT = 1 shl 2,
+  WLR_EDGE_RIGHT = 1 shl 3
+
 ## addon
 
 type
@@ -43,16 +52,57 @@ proc transform*(dest: ptr WlrBox; box: ptr WlrBox; transform: WlOutputTransform;
 proc empty*(box: ptr WlrFbox): bool {.importc: "wlr_fbox_empty".}
 proc transform*(dest: ptr WlrFbox; box: ptr WlrFbox; transform: WlOutputTransform; width: cdouble; height: cdouble) {.importc: "wlr_fbox_transform".}
 
-## edges
-
-type wlr_edges* = enum
-  WLR_EDGE_NONE = 0,
-  WLR_EDGE_TOP = 1 shl 0,
-  WLR_EDGE_BOTTOM = 1 shl 1,
-  WLR_EDGE_LEFT = 1 shl 2,
-  WLR_EDGE_RIGHT = 1 shl 3
-
-# TODO: log.h
 # XXX: where'd region go?
+
+## log
+
+#[
+
+#ifndef WLR_UTIL_LOG_H
+#define WLR_UTIL_LOG_H
+
+#include <stdbool.h>
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
+
+type WlrLogImportance* = enum
+  WLR_SILENT = 0,
+  WLR_ERROR = 1,
+  WLR_INFO = 2,
+  WLR_DEBUG = 3,
+  WLR_LOG_IMPORTANCE_LAST
+
+type WlrLogFunc* =
+  proc (importance: WlrLogImportance; fmt: cstring; args: varargs[string])
+
+proc WlrLogInit*(verbosity: WlrLogImportance; callback: WlrLogFunc) {.importc: "wlr_log_init".}
+proc WlrLogGetVerbosity*(): WlrLogImportance {.importc: "wlr_log_get_verbosity".}
+
+when defined(__GNUC__):
+  const _WLR_ATTRIB_PRINTF(start, end) = __attribute__((format(printf, start, end)))
+else:
+  const _WLR_ATTRIB_PRINTF(start, end)
+
+void _wlr_log(enum wlr_log_importance verbosity, const char *format, ...) _WLR_ATTRIB_PRINTF(2, 3);
+void _wlr_vlog(enum wlr_log_importance verbosity, const char *format, va_list args) _WLR_ATTRIB_PRINTF(2, 0);
+
+when defined(WLR_REL_SRC_DIR):
+  const _WLR_FILENAME* = (cast[cstring](__FILE__) + sizeof((WLR_REL_SRC_DIR)) - 1)
+else:
+  const _WLR_FILENAME* = __FILE__
+
+template wlr_log(verb, fmt, ...): untyped =
+  _wlr_log(verb, "[%s:%d] ", fmt, __FILE__, __LINE__, __VA_ARGS__)
+
+template wlr_vlog*(verb, fmt, args: untyped): untyped =
+  _wlr_vlog(verb, "[%s:%d] ", fmt, __FILE__, __LINE__, args)
+
+template wlr_log_errno*(verb, fmt, ...): untyped =
+  wlr_log(verb, fmt, ": %s", __VA_ARGS__, strerror(errno))
+
+#endif
+
+]#
 
 {.pop.}
