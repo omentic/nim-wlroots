@@ -1,19 +1,22 @@
 {.push dynlib: "libwlroots.so".}
 
-type INNER_C_STRUCT_backend_22* {.bycopy.} = object
-  destroy*: wl_signal
-  new_input*: wl_signal
-  new_output*: wl_signal
+import std/posix
+import wayland
 
-type wlr_backend* {.bycopy.} = object
-  impl*: ptr wlr_backend_impl
-  events*: INNER_C_STRUCT_backend_22
+type WlrBackend_events* {.bycopy.} = object
+  destroy*: WlSignal
+  new_input*: WlSignal
+  new_output*: WlSignal
 
-proc wlr_backend_autocreate*(display: ptr wl_display): ptr wlr_backend {.importc: "wlr_backend_autocreate".}
-proc wlr_backend_start*(backend: ptr wlr_backend): bool {.importc: "wlr_backend_start".}
-proc wlr_backend_destroy*(backend: ptr wlr_backend) {.importc: "wlr_backend_destroy".}
-proc wlr_backend_get_session*(backend: ptr wlr_backend): ptr wlr_session {.importc: "wlr_backend_get_session".}
-proc wlr_backend_get_presentation_clock*(backend: ptr wlr_backend): clockid_t {.importc: "wlr_backend_get_presentation_clock".}
-proc wlr_backend_get_drm_fd*(backend: ptr wlr_backend): cint {.importc: "wlr_backend_get_drm_fd".}
+type WlrBackend* {.bycopy.} = object
+  impl*: ptr WlrBackend_impl
+  events*: WlrBackend_events
+
+proc autocreateWlrBackend*(display: ptr WlDisplay): ptr WlrBackend {.importc: "wlr_backend_autocreate".}
+proc start*(backend: ptr WlrBackend): bool {.importc: "wlr_backend_start".}
+proc destroy*(backend: ptr WlrBackend) {.importc: "wlr_backend_destroy".}
+proc getSession*(backend: ptr WlrBackend): ptr WlrSession {.importc: "wlr_backend_get_session".}
+proc getPresentationClock*(backend: ptr WlrBackend): ClockId {.importc: "wlr_backend_get_presentation_clock".}
+proc getDrmFd*(backend: ptr WlrBackend): cint {.importc: "wlr_backend_get_drm_fd".}
 
 {.pop.}
