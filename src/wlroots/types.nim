@@ -117,16 +117,16 @@ type
     map*: WlSignal
     unmap*: WlSignal
 
-type SurfaceStateField* = enum
-  WLR_SURFACE_STATE_BUFFER = 1 shl 0,
-  WLR_SURFACE_STATE_SURFACE_DAMAGE = 1 shl 1,
-  WLR_SURFACE_STATE_BUFFER_DAMAGE = 1 shl 2,
-  WLR_SURFACE_STATE_OPAQUE_REGION = 1 shl 3,
-  WLR_SURFACE_STATE_INPUT_REGION = 1 shl 4,
-  WLR_SURFACE_STATE_TRANSFORM = 1 shl 5,
-  WLR_SURFACE_STATE_SCALE = 1 shl 6,
-  WLR_SURFACE_STATE_FRAME_CALLBACK_LIST = 1 shl 7,
-  WLR_SURFACE_STATE_VIEWPORT_FIXME = 1 shl 8
+type SurfaceStateField* {.pure.} = enum
+  BUFFER = 1 shl 0,
+  SURFACE_DAMAGE = 1 shl 1,
+  BUFFER_DAMAGE = 1 shl 2,
+  OPAQUE_REGION = 1 shl 3,
+  INPUT_REGION = 1 shl 4,
+  TRANSFORM = 1 shl 5,
+  SCALE = 1 shl 6,
+  FRAME_CALLBACK_LIST = 1 shl 7,
+  VIEWPORT = 1 shl 8
 
 type SurfaceIteratorFunc_t* = proc (surface: ptr Surface; sx: cint; sy: cint; data: pointer)
 
@@ -195,10 +195,10 @@ type
     preferred*: bool
     link*: WlList
 
-  OutputAdaptiveSyncStatus* = enum
-    WLR_OUTPUT_ADAPTIVE_SYNC_DISABLED,
-    WLR_OUTPUT_ADAPTIVE_SYNC_ENABLED,
-    WLR_OUTPUT_ADAPTIVE_SYNC_UNKNOWN
+  OutputAdaptiveSyncStatus* {.pure.} = enum
+    DISABLED,
+    ENABLED,
+    UNKNOWN
 
   OutputState* {.bycopy.} = object
     committed*: uint32
@@ -215,9 +215,9 @@ type
     gamma_lut*: ptr uint16
     gamma_lut_size*: csize_t
 
-  OutputStateModeType* = enum
-    WLR_OUTPUT_STATE_MODE_FIXED,
-    WLR_OUTPUT_STATE_MODE_CUSTOM
+  OutputStateModeType* {.pure.} = enum
+    FIXED,
+    CUSTOM
 
   OutputState_custom_mode* {.bycopy.} = object
     width*, height*: int32
@@ -253,16 +253,16 @@ type
     description*: WlSignal
     destroy*: WlSignal
 
-type OutputStateField* = enum
-  WLR_OUTPUT_STATE_BUFFER = 1 shl 0,
-  WLR_OUTPUT_STATE_DAMAGE = 1 shl 1,
-  WLR_OUTPUT_STATE_MODE = 1 shl 2,
-  WLR_OUTPUT_STATE_ENABLED = 1 shl 3,
-  WLR_OUTPUT_STATE_SCALE = 1 shl 4,
-  WLR_OUTPUT_STATE_TRANSFORM = 1 shl 5,
-  WLR_OUTPUT_STATE_ADAPTIVE_SYNC_ENABLED = 1 shl 6,
-  WLR_OUTPUT_STATE_GAMMA_LUT = 1 shl 7,
-  WLR_OUTPUT_STATE_RENDER_FORMAT = 1 shl 8
+type OutputStateField* {.pure.} = enum
+  BUFFER = 1 shl 0,
+  DAMAGE = 1 shl 1,
+  MODE = 1 shl 2,
+  ENABLED = 1 shl 3,
+  SCALE = 1 shl 4,
+  TRANSFORM = 1 shl 5,
+  ADAPTIVE_SYNC_ENABLED = 1 shl 6,
+  GAMMA_LUT = 1 shl 7,
+  RENDER_FORMAT = 1 shl 8
 
 # const WLR_OUTPUT_STATE_BACKEND_OPTIONAL*: OutputStateField =
 #   WLR_OUTPUT_STATE_DAMAGE or
@@ -285,11 +285,11 @@ type OutputEventCommit* {.bycopy.} = object
   `when`*: ptr Timespec
   buffer*: ptr Buffer
 
-type OutputPresentFlag* = enum
-  WLR_OUTPUT_PRESENT_VSYNC = 0x1,
-  WLR_OUTPUT_PRESENT_HW_CLOCK = 0x2,
-  WLR_OUTPUT_PRESENT_HW_COMPLETION = 0x4,
-  WLR_OUTPUT_PRESENT_ZERO_COPY = 0x8
+type OutputPresentFlag* {.pure.} = enum
+  VSYNC = 0x1,
+  HW_CLOCK = 0x2,
+  HW_COMPLETION = 0x4,
+  ZERO_COPY = 0x8
 
 type OutputEventPresent* {.bycopy.} = object
   output*: ptr Output
@@ -453,14 +453,14 @@ type
 proc init*(switch_device: ptr Switch; impl: ptr Switch_impl) {.importc: "wlr_switch_init".}
 proc destroy*(switch_device: ptr Switch) {.importc: "wlr_switch_destroy".}
 
-type SwitchType* = enum
-  WLR_SWITCH_TYPE_LID = 1,
-  WLR_SWITCH_TYPE_TABLET_MODE
+type SwitchType* {.pure.} = enum
+  LID = 1,
+  TABLET_MODE
 
-type SwitchState* = enum
-  WLR_SWITCH_STATE_OFF = 0,
-  WLR_SWITCH_STATE_ON,
-  WLR_SWITCH_STATE_TOGGLE
+type SwitchState* {.pure.} = enum
+  OFF = 0,
+  ON,
+  TOGGLE
 
 ## wlr_touch
 
@@ -485,15 +485,15 @@ proc destroy*(touch: ptr Touch) {.importc: "wlr_touch_destroy".}
 
 ## wlr_tablet_tool
 
-type TabletToolType* = enum
-  WLR_TABLET_TOOL_TYPE_PEN = 1,
-  WLR_TABLET_TOOL_TYPE_ERASER,
-  WLR_TABLET_TOOL_TYPE_BRUSH,
-  WLR_TABLET_TOOL_TYPE_PENCIL,
-  WLR_TABLET_TOOL_TYPE_AIRBRUSH,
-  WLR_TABLET_TOOL_TYPE_MOUSE,
-  WLR_TABLET_TOOL_TYPE_LENS,
-  WLR_TABLET_TOOL_TYPE_TOTEM
+type TabletToolType* {.pure.} = enum
+  PEN = 1,
+  ERASER,
+  BRUSH,
+  PENCIL,
+  AIRBRUSH,
+  MOUSE,
+  LENS,
+  TOTEM
 
 type
   TabletTool* {.bycopy.} = object
@@ -532,16 +532,16 @@ type
 proc init*(tablet: ptr Tablet; impl: ptr Tablet_impl) {.importc: "wlr_tablet_init".}
 proc destroy*(tablet: ptr Tablet) {.importc: "wlr_tablet_destroy".}
 
-type TabletToolAxes* = enum
-  WLR_TABLET_TOOL_AXIS_X = 1 shl 0,
-  WLR_TABLET_TOOL_AXIS_Y = 1 shl 1,
-  WLR_TABLET_TOOL_AXIS_DISTANCE = 1 shl 2,
-  WLR_TABLET_TOOL_AXIS_PRESSURE = 1 shl 3,
-  WLR_TABLET_TOOL_AXIS_TILT_X = 1 shl 4,
-  WLR_TABLET_TOOL_AXIS_TILT_Y = 1 shl 5,
-  WLR_TABLET_TOOL_AXIS_ROTATION = 1 shl 6,
-  WLR_TABLET_TOOL_AXIS_SLIDER = 1 shl 7,
-  WLR_TABLET_TOOL_AXIS_WHEEL = 1 shl 8
+type TabletToolAxes* {.pure.} = enum
+  X = 1 shl 0,
+  Y = 1 shl 1,
+  DISTANCE = 1 shl 2,
+  PRESSURE = 1 shl 3,
+  TILT_X = 1 shl 4,
+  TILT_Y = 1 shl 5,
+  ROTATION = 1 shl 6,
+  SLIDER = 1 shl 7,
+  WHEEL = 1 shl 8
 
 ## wlr_tablet_pad
 
@@ -578,9 +578,9 @@ type TabletPadGroup* {.bycopy.} = object
   rings*: ptr cuint
   mode_count*: cuint
 
-type TabletPadRingSource* = enum
-  WLR_TABLET_PAD_RING_SOURCE_UNKNOWN,
-  WLR_TABLET_PAD_RING_SOURCE_FINGER
+type TabletPadRingSource* {.pure.} = enum
+  UNKNOWN,
+  FINGER
 
 type EventTabletPadRing* {.bycopy.} = object
   time_msec*: uint32
@@ -589,9 +589,9 @@ type EventTabletPadRing* {.bycopy.} = object
   position*: cdouble
   mode*: cuint
 
-type TabletPadStripSource* = enum
-  WLR_TABLET_PAD_STRIP_SOURCE_UNKNOWN,
-  WLR_TABLET_PAD_STRIP_SOURCE_FINGER
+type TabletPadStripSource* {.pure.} = enum
+  UNKNOWN,
+  FINGER
 
 type EventTabletPadStrip* {.bycopy.} = object
   time_msec*: uint32
@@ -604,22 +604,22 @@ type EventTabletPadStrip* {.bycopy.} = object
 
 const WLR_LED_COUNT* = 3
 
-type KeyboardLed* = enum
-  WLR_LED_NUM_LOCK = 1 shl 0,
-  WLR_LED_CAPS_LOCK = 1 shl 1,
-  WLR_LED_SCROLL_LOCK = 1 shl 2
+type KeyboardLed* {.pure.} = enum
+  NUM_LOCK = 1 shl 0,
+  CAPS_LOCK = 1 shl 1,
+  SCROLL_LOCK = 1 shl 2
 
 const WLR_MODIFIER_COUNT* = 8
 
-type KeyboardModifier* = enum
-  WLR_MODIFIER_SHIFT = 1 shl 0,
-  WLR_MODIFIER_CAPS = 1 shl 1,
-  WLR_MODIFIER_CTRL = 1 shl 2,
-  WLR_MODIFIER_ALT = 1 shl 3,
-  WLR_MODIFIER_MOD2 = 1 shl 4,
-  WLR_MODIFIER_MOD3 = 1 shl 5,
-  WLR_MODIFIER_LOGO = 1 shl 6,
-  WLR_MODIFIER_MOD5 = 1 shl 7
+type KeyboardModifier* {.pure.} = enum
+  SHIFT = 1 shl 0,
+  CAPS = 1 shl 1,
+  CTRL = 1 shl 2,
+  ALT = 1 shl 3,
+  MOD2 = 1 shl 4,
+  MOD3 = 1 shl 5,
+  LOGO = 1 shl 6,
+  MOD5 = 1 shl 7
 
 const WLR_KEYBOARD_KEYS_CAP* = 32
 
@@ -745,9 +745,9 @@ type
     x*, y*: cdouble
     state*: TabletToolProximityState
 
-  TabletToolProximityState* = enum
-    WLR_TABLET_TOOL_PROXIMITY_OUT,
-    WLR_TABLET_TOOL_PROXIMITY_IN
+  TabletToolProximityState* {.pure.} = enum
+    OUT,
+    IN
 
   EventTabletToolTip* {.bycopy.} = object
     device*: ptr InputDevice
@@ -756,9 +756,9 @@ type
     x*, y*: cdouble
     state*: TabletToolTipState
 
-  TabletToolTipState* = enum
-    WLR_TABLET_TOOL_TIP_UP,
-    WLR_TABLET_TOOL_TIP_DOWN
+  TabletToolTipState* {.pure.} = enum
+    TIP_UP,
+    TIP_DOWN
 
   EventTabletToolButton* {.bycopy.} = object
     device*: ptr InputDevice
@@ -780,8 +780,8 @@ type
     button*: uint32
     state*: ButtonState
 
-  ButtonState* = enum
-    WLR_BUTTON_RELEASED, WLR_BUTTON_PRESSED
+  ButtonState* {.pure.} = enum
+    RELEASED, PRESSED
 
   InputDevice* {.bycopy.} = object
     impl*: ptr InputDevice_impl
@@ -799,13 +799,13 @@ type
   InputDevice_impl* {.bycopy.} = object
     destroy*: proc (wlr_device: ptr InputDevice)
 
-  InputDeviceType* = enum
-    WLR_INPUT_DEVICE_KEYBOARD,
-    WLR_INPUT_DEVICE_POINTER,
-    WLR_INPUT_DEVICE_TOUCH,
-    WLR_INPUT_DEVICE_TABLET_TOOL,
-    WLR_INPUT_DEVICE_TABLET_PAD,
-    WLR_INPUT_DEVICE_SWITCH
+  InputDeviceType* {.pure.} = enum
+    KEYBOARD,
+    POINTER,
+    TOUCH,
+    TABLET_TOOL,
+    TABLET_PAD,
+    SWITCH
 
   InputDevice_ano* {.bycopy, union.} = object
     device*: pointer # NOTE: _device
@@ -940,15 +940,15 @@ type EventPointerMotionAbsolute* {.bycopy.} = object
   time_msec*: uint32
   x*, y*: cdouble
 
-type AxisSource* = enum
-  WLR_AXIS_SOURCE_WHEEL,
-  WLR_AXIS_SOURCE_FINGER,
-  WLR_AXIS_SOURCE_CONTINUOUS,
-  WLR_AXIS_SOURCE_WHEEL_TILT
+type AxisSource* {.pure.} = enum
+  WHEEL,
+  FINGER,
+  CONTINUOUS,
+  WHEEL_TILT
 
-type AxisOrientation* = enum
-  WLR_AXIS_ORIENTATION_VERTICAL,
-  WLR_AXIS_ORIENTATION_HORIZONTAL
+type AxisOrientation* {.pure.} = enum
+  VERTICAL,
+  HORIZONTAL
 
 type EventPointerAxis* {.bycopy.} = object
   device*: ptr InputDevice
@@ -1043,11 +1043,11 @@ proc getBox*(layout: ptr OutputLayout; reference: ptr Output): ptr Box {.importc
 proc addAuto*(layout: ptr OutputLayout; output: ptr Output) {.importc: "wlr_output_layout_add_auto".}
 proc getCenterOutput*(layout: ptr OutputLayout): ptr Output {.importc: "wlr_output_layout_get_center_output".}
 
-type Direction* = enum
-  WLR_DIRECTION_UP = 1 shl 0,
-  WLR_DIRECTION_DOWN = 1 shl 1,
-  WLR_DIRECTION_LEFT = 1 shl 2,
-  WLR_DIRECTION_RIGHT = 1 shl 3
+type Direction* {.pure.} = enum
+  UP = 1 shl 0,
+  DOWN = 1 shl 1,
+  LEFT = 1 shl 2,
+  RIGHT = 1 shl 3
 
 proc adjacentOutput*(layout: ptr OutputLayout; direction: Direction; reference: ptr Output; ref_lx: cdouble; ref_ly: cdouble): ptr Output {.importc: "wlr_output_layout_adjacent_output".}
 proc farthestOutput*(layout: ptr OutputLayout; direction: Direction; reference: ptr Output; ref_lx: cdouble; ref_ly: cdouble): ptr Output {.importc: "wlr_output_layout_farthest_output".}
@@ -1353,10 +1353,10 @@ type
     unmap*: WlSignal
     destroy*: WlSignal
 
-  DragGrabType* = enum
-    WLR_DRAG_GRAB_KEYBOARD,
-    WLR_DRAG_GRAB_KEYBOARD_POINTER,
-    WLR_DRAG_GRAB_KEYBOARD_TOUCH
+  DragGrabType* {.pure.} = enum
+    KEYBOARD,
+    KEYBOARD_POINTER,
+    KEYBOARD_TOUCH
 
 ## wlr_primary_selection
 
@@ -1390,8 +1390,8 @@ type
     in_ask*: bool
     source_destroy*: WlListener
 
-  DataOfferType* = enum
-    WLR_DATA_OFFER_SELECTION, WLR_DATA_OFFER_DRAG
+  DataOfferType* {.pure.} = enum
+    SELECTION, DRAG
 
 type DragMotionEvent* {.bycopy.} = object
   drag*: ptr Drag
@@ -1670,11 +1670,11 @@ type
   ForeignToplevelManager_v1_events* {.bycopy.} = object
     destroy*: WlSignal
 
-type ForeignToplevelHandle_v1_state* = enum
-  WLR_FOREIGN_TOPLEVEL_HANDLE_V1_STATE_MAXIMIZED = (1 shl 0),
-  WLR_FOREIGN_TOPLEVEL_HANDLE_V1_STATE_MINIMIZED = (1 shl 1),
-  WLR_FOREIGN_TOPLEVEL_HANDLE_V1_STATE_ACTIVATED = (1 shl 2),
-  WLR_FOREIGN_TOPLEVEL_HANDLE_V1_STATE_FULLSCREEN = (1 shl 3)
+type ForeignToplevelHandle_v1_state* {.pure.} = enum
+  MAXIMIZED = (1 shl 0),
+  MINIMIZED = (1 shl 1),
+  ACTIVATED = (1 shl 2),
+  FULLSCREEN = (1 shl 3)
 
 type
   ForeignToplevelHandle_v1* {.bycopy.} = object
@@ -2019,13 +2019,13 @@ type
     new_surface*: WlSignal
     destroy*: WlSignal
 
-type LayerSurface_v1_state_field* = enum
-  WLR_LAYER_SURFACE_V1_STATE_DESIRED_SIZE = 1 shl 0,
-  WLR_LAYER_SURFACE_V1_STATE_ANCHOR = 1 shl 1,
-  WLR_LAYER_SURFACE_V1_STATE_EXCLUSIVE_ZONE = 1 shl 2,
-  WLR_LAYER_SURFACE_V1_STATE_MARGIN_FIXME = 1 shl 3,
-  WLR_LAYER_SURFACE_V1_STATE_KEYBOARD_INTERACTIVITY = 1 shl 4,
-  WLR_LAYER_SURFACE_V1_STATE_LAYER = 1 shl 5
+type LayerSurface_v1_state_field* {.pure.} = enum
+  DESIRED_SIZE = 1 shl 0,
+  ANCHOR = 1 shl 1,
+  EXCLUSIVE_ZONE = 1 shl 2,
+  MARGIN = 1 shl 3,
+  KEYBOARD_INTERACTIVITY = 1 shl 4,
+  LAYER = 1 shl 5
 
 type
   LayerSurface_v1* {.bycopy.} = object
@@ -2243,13 +2243,13 @@ proc createOutputConfigurationHead_v1*(config: ptr OutputConfiguration_v1; outpu
 
 # import pointer-constraints-unstable-v1-protocol
 
-type PointerConstraint_v1_type* = enum
-  WLR_POINTER_CONSTRAINT_V1_LOCKED,
-  WLR_POINTER_CONSTRAINT_V1_CONFINED
+type PointerConstraint_v1_type* {.pure.} = enum
+  LOCKED,
+  CONFINED
 
-type PointerConstraint_v1_state_field* = enum
-  WLR_POINTER_CONSTRAINT_V1_STATE_REGION = 1 shl 0,
-  WLR_POINTER_CONSTRAINT_V1_STATE_CURSOR_HINT = 1 shl 1
+type PointerConstraint_v1_state_field* {.pure.} = enum
+  REGION = 1 shl 0,
+  CURSOR_HINT = 1 shl 1
 
 type
   PointerConstraint_v1* {.bycopy.} = object
@@ -2461,10 +2461,10 @@ type
   XdgPositioner_offset* {.bycopy.} = object
     x*, y*: int32
 
-type XdgSurfaceRole* = enum
-  WLR_XDG_SURFACE_ROLE_NONE,
-  WLR_XDG_SURFACE_ROLE_TOPLEVEL,
-  WLR_XDG_SURFACE_ROLE_POPUP
+type XdgSurfaceRole* {.pure.} = enum
+  NONE,
+  TOPLEVEL,
+  POPUP
 
 type
   XdgSurface* {.bycopy.} = object
@@ -2636,12 +2636,12 @@ proc scheduleConfigure*(surface: ptr XdgSurface): uint32 {.importc: "wlr_xdg_sur
 
 ## wlr_scene
 
-type SceneNodeType* = enum
-  WLR_SCENE_NODE_ROOT,
-  WLR_SCENE_NODE_TREE,
-  WLR_SCENE_NODE_SURFACE,
-  WLR_SCENE_NODE_RECT,
-  WLR_SCENE_NODE_BUFFER
+type SceneNodeType* {.pure.} = enum
+  ROOT,
+  TREE,
+  SURFACE,
+  RECT,
+  BUFFER
 
 type SceneNode_state* {.bycopy.} = object
   link*: WlList
@@ -2782,10 +2782,10 @@ proc createScreencopyManager_v1*(display: ptr WlDisplay): ptr ScreencopyManager_
 
 ## wlr_server_decoration
 
-type ServerDecorationManagerMode* = enum
-  WLR_SERVER_DECORATION_MANAGER_MODE_NONE = 0,
-  WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT = 1,
-  WLR_SERVER_DECORATION_MANAGER_MODE_SERVER = 2
+type ServerDecorationManagerMode* {.pure.} = enum
+  NONE = 0,
+  CLIENT = 1,
+  SERVER = 2
 
 type
   ServerDecorationManager* {.bycopy.} = object
@@ -2984,10 +2984,10 @@ proc accepts*(tablet: ptr Tablet_v2_tablet; surface: ptr Surface): bool {.import
 
 ## wlr_text_input_v3
 
-type TextInput_v3_features* = enum
-  WLR_TEXT_INPUT_V3_FEATURE_SURROUNDING_TEXT = 1 shl 0,
-  WLR_TEXT_INPUT_V3_FEATURE_CONTENT_TYPE = 1 shl 1,
-  WLR_TEXT_INPUT_V3_FEATURE_CURSOR_RECTANGLE = 1 shl 2
+type TextInput_v3_features* {.pure.} = enum
+  SURROUNDING_TEXT = 1 shl 0,
+  CONTENT_TYPE = 1 shl 1,
+  CURSOR_RECTANGLE = 1 shl 2
 
 type
   TextInput_v3* {.bycopy.} = object
@@ -3216,10 +3216,10 @@ type
     surface_commit*: WlListener
     data*: pointer
 
-  XdgToplevelDecoration_v1_mode* = enum
-    WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_NONE = 0,
-    WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE = 1,
-    WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE = 2
+  XdgToplevelDecoration_v1_mode* {.pure.} = enum
+    NONE = 0,
+    CLIENT_SIDE = 1,
+    SERVER_SIDE = 2
 
   XdgToplevelDecoration_v1_configure* {.bycopy.} = object
     link*: WlList

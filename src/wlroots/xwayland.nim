@@ -5,7 +5,6 @@ import wayland, xcb, wlroots/types
 
 ## shim TODO
 type
-  csize_t = object
   Xwm = object
   XwaylandCursor = object
 
@@ -60,10 +59,10 @@ type Xwayland* {.bycopy.} = object
   seat_destroy*: WlListener
   data*: pointer
 
-type XwaylandSurfaceDecorations* = enum
-  WLR_XWAYLAND_SURFACE_DECORATIONS_ALL = 0,
-  WLR_XWAYLAND_SURFACE_DECORATIONS_NO_BORDER = 1,
-  WLR_XWAYLAND_SURFACE_DECORATIONS_NO_TITLE = 2
+type XwaylandSurfaceDecorations* {.pure.} = enum
+  ALL = 0,
+  NO_BORDER = 1,
+  NO_TITLE = 2
 
 type XwaylandSurfaceHints* {.bycopy.} = object
   flags*: uint32
@@ -88,11 +87,11 @@ type XwaylandSurfaceSizeHints* {.bycopy.} = object
   max_aspect_num*, max_aspect_den*: int32
   win_gravity*: uint32
 
-type XwaylandIcccmInputModel* = enum
-  WLR_ICCCM_INPUT_MODEL_NONE = 0,
-  WLR_ICCCM_INPUT_MODEL_PASSIVE = 1,
-  WLR_ICCCM_INPUT_MODEL_LOCAL = 2,
-  WLR_ICCCM_INPUT_MODEL_GLOBAL = 3
+type XwaylandIcccmInputModel* {.pure.} = enum
+  NONE = 0,
+  PASSIVE = 1,
+  LOCAL = 2,
+  GLOBAL = 3
 
 type XwaylandSurface_events* {.bycopy.} = object
   destroy*: WlSignal

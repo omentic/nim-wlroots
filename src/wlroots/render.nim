@@ -67,10 +67,10 @@ type
     destroy*: WlSignal
     release*: WlSignal
 
-type BufferCap* = enum
-  WLR_BUFFER_CAP_DATA_PTR = 1 shl 0,
-  WLR_BUFFER_CAP_DMABUF = 1 shl 1,
-  WLR_BUFFER_CAP_SHM = 1 shl 2
+type BufferCap* {.pure.} = enum
+  DATA_PTR = 1 shl 0,
+  DMABUF = 1 shl 1,
+  SHM = 1 shl 2
 
 type BufferResourceInterface* {.bycopy.} = object
   name*: cstring
@@ -86,9 +86,9 @@ proc getShm*(buffer: ptr Buffer; attribs: ptr ShmAttributes): bool {.importc: "w
 proc register*(iface: ptr BufferResourceInterface) {.importc: "wlr_buffer_register_resource_interface".}
 proc buffer*(resource: ptr WlResource): ptr Buffer {.importc: "wlr_buffer_from_resource".}
 
-type BufferDataPtrAccessFlag* = enum
-  WLR_BUFFER_DATA_PTR_ACCESS_READ = 1 shl 0,
-  WLR_BUFFER_DATA_PTR_ACCESS_WRITE = 1 shl 1
+type BufferDataPtrAccessFlag* {.pure.} = enum
+  READ = 1 shl 0,
+  WRITE = 1 shl 1
 
 proc beginDataPtrAccess*(buffer: ptr Buffer; flags: uint32; data: ptr pointer; format: ptr uint32; stride: ptr csize_t): bool {.importc: "wlr_buffer_begin_data_ptr_access".}
 proc endDataPtrAccess*(buffer: ptr Buffer) {.importc: "wlr_buffer_end_data_ptr_access".}
@@ -112,8 +112,8 @@ proc intersect*(dst: ptr DrmFormatSet; a: ptr DrmFormatSet; b: ptr DrmFormatSet)
 
 ## wlr_renderer
 
-type RendererReadPixelsFlags* = enum
-  WLR_RENDERER_READ_PIXELS_Y_INVERT = 1
+type RendererReadPixelsFlags* {.pure.} = enum
+  Y_INVERT = 1
 
 type
   Renderer* {.bycopy.} = object

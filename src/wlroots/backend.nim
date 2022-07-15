@@ -9,8 +9,8 @@ type
   udev = object
   udev_monitor = object
   libseat = object
-  ssize_t = object
   DrmBackend = object
+  ssize_t = int16
 
 ## session
 
@@ -58,9 +58,9 @@ type
     `type`*: DeviceChangeType
     ano_session_74*: DeviceChangeEvent_ano
 
-  DeviceChangeType* = enum
-    WLR_DEVICE_HOTPLUG = 1,
-    WLR_DEVICE_LEASE
+  DeviceChangeType* {.pure.} = enum
+    HOTPLUG = 1,
+    LEASE
 
   DeviceChangeEvent_ano* {.bycopy, union.} = object
     hotplug*: DeviceHotplugEvent
