@@ -5,3 +5,4 @@ license = "MIT"
 srcDir = "src"
 
 requires "https://github.com/j-james/nim-wayland"
+requires "https://github.com/j-james/nim-xkbcommon"
