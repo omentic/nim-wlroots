@@ -56,14 +56,11 @@ type
 type
   DeviceChangeEvent* {.bycopy.} = object
     `type`*: DeviceChangeType
-    ano_session_74*: DeviceChangeEvent_ano
+    hotplug*: DeviceHotplugEvent
 
   DeviceChangeType* {.pure.} = enum
     HOTPLUG = 1,
     LEASE
-
-  DeviceChangeEvent_ano* {.bycopy, union.} = object
-    hotplug*: DeviceHotplugEvent
 
 proc createSession*(disp: ptr WlDisplay): ptr Session {.importc: "wlr_session_create".}
 proc destroy*(session: ptr Session) {.importc: "wlr_session_destroy".}
